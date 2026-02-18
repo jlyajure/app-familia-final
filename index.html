@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Familia Yajure - Oficial</title>
+    <link rel="icon" type="image/png" href="https://img.icons8.com/emoji/192/house-with-garden.png">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        * { box-sizing: border-box; }
+        :root { --blue: #3b82f6; --bg: #0f172a; --red: #ff0000; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: var(--bg); color: white; overflow-x: hidden; }
+        
+        /* LOGIN */
+        #login-screen { position: fixed; inset: 0; background: url('https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&q=80&w=2070') no-repeat center center/cover; display: flex; align-items: flex-start; justify-content: center; z-index: 9999; padding-top: 80px; }
+        #login-screen::before { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.6); }
+        .login-box { position: relative; background: rgba(15, 23, 42, 0.95); padding: 40px; border-radius: 30px; text-align: center; width: 90%; max-width: 320px; border: 1px solid rgba(255,255,255,0.2); }
+        input { width: 100%; padding: 15px; border-radius: 15px; border: 2px solid var(--blue); background: #1e293b; color: white; text-align: center; font-size: 18px; margin-top: 20px; outline: none; }
+
+        /* HEADER */
+        header { background: #1e293b; padding: 15px 20px; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
+        .btn-out { background: var(--red); color: white; border: none; padding: 8px 15px; border-radius: 10px; font-weight: 800; cursor: pointer; }
+
+        .container { max-width: 500px; margin: auto; padding: 15px; }
+
+        /* FILTROS */
+        .scroll { overflow-x: auto; white-space: nowrap; padding-bottom: 15px; display: flex; gap: 10px; }
+        .scroll::-webkit-scrollbar { height: 5px; display: block; }
+        .scroll::-webkit-scrollbar-thumb { background: var(--blue); border-radius: 10px; }
+        .chip { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: 600; }
+        .chip.active { background: var(--blue); border-color: var(--blue); }
+
+        /* UPLOAD */
+        .upload { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 25px; border: 2px dashed rgba(255,255,255,0.2); margin-bottom: 25px; text-align: center; }
+        .sel { width: 100%; padding: 12px; border-radius: 12px; margin-bottom: 10px; font-weight: 800; background: white; color: black; border: none; }
+        .btn-up { background: var(--blue); color: white; width: 100%; padding: 15px; border-radius: 15px; font-weight: 800; border: none; cursor: pointer; }
+
+        /* POSTS */
+        .card { background: white; border-radius: 25px; padding: 20px; margin-bottom: 25px; color: #0f172a; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        
+        .c-wrap { position: relative; margin: 10px -20px; background: #000; overflow: hidden; }
+        .c-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; }
+        .c-track img { width: 100%; flex-shrink: 0; scroll-snap-align: start; aspect-ratio: 1/1; object-fit: cover; }
+        
+        /* FLECHAS */
+        .nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.8); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10; font-weight: bold; color: black; border: none; }
+        .prev { left: 10px; }
+        .next { right: 10px; }
+
+        .dots { display: flex; justify-content: center; gap: 5px; margin-top: 10px; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: #ccc; }
+        .dot.active { background: var(--blue); }
+
+        /* ACCIONES */
+        .trash { background: var(--red); color: white; border: none; padding: 8px 15px; border-radius: 8px; font-size: 12px; cursor: pointer; font-weight: 800; box-shadow: 0 4px 10px rgba(255,0,0,0.3); }
+        .like { background: none; border: none; font-size: 16px; cursor: pointer; color: #64748b; font-weight: 800; padding: 10px 0; display: flex; align-items: center; gap: 5px; }
+        .like.yes { color: #ff0000 !important; }
+        .like.yes span { color: #ff0000 !important; }
+    </style>
+</head>
+<body>
+
+<div id="login-screen">
+    <div class="login-box">
+        <div style="font-size: 50px;">🌅</div>
+        <h2 style="color:white; margin:10px 0;">Familia Yajure</h2>
+        <input type="password" id="passInput" placeholder="Clave de acceso">
+    </div>
+</div>
+
+<div id="app-content" style="display:none;">
+    <header>
+        <span style="font-weight: 800;">Recuerdos</span>
+        <button onclick="window.salir()" class="btn-out">Salir 🔒</button>
+    </header>
+
+    <div class="container">
+        <div class="scroll">
+            <button class="chip active" id="btn-Todo" onclick="window.filt('Todo')">Todo</button>
+            <button class="chip" id="btn-Familia" onclick="window.filt('Familia')">🏠 Familia</button>
+            <button class="chip" id="btn-Fiestas" onclick="window.filt('Fiestas')">🎉 Fiestas</button>
+            <button class="chip" id="btn-Viajes" onclick="window.filt('Viajes')">✈️ Viajes</button>
+            <button class="chip" id="btn-Recuerdos" onclick="window.filt('Recuerdos')">📜 Recuerdos</button>
+            <button class="chip" id="btn-Jodedera" onclick="window.filt('Jodedera')">🤣 Jodedera</button>
+        </div>
+
+        <div class="upload">
+            <select id="cat" class="sel">
+                <option value="Familia">🏠 Familia</option>
+                <option value="Fiestas">🎉 Fiestas</option>
+                <option value="Viajes">✈️ Viajes</option>
+                <option value="Recuerdos">📜 Recuerdos</option>
+                <option value="Jodedera">🤣 Jodedera</option>
+            </select>
+            <button class="btn-up" id="btnUp" onclick="document.getElementById('file').click()">📸 SUBIR FOTO</button>
+            <div id="status" style="margin-top:10px; font-weight:800; color:#3b82f6;"></div>
+        </div>
+        <input type="file" id="file" style="display:none;" accept="image/*" multiple>
+        
+        <div id="muro"></div>
+    </div>
+</div>
+
+<script type="module">
+    import { db } from "./firebase.js";
+    import { collection, addDoc, query, orderBy, onSnapshot, updateDoc, doc, arrayUnion, arrayRemove, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const K = "07dd4f0a1180673510c5047ae8b5eec8"; 
+
+    // 1. LOGIN
+    window.onload = () => {
+        const a = localStorage.getItem('fa_key');
+        if(a === "familia2026" || a === "ticoadmin2026") {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('app-content').style.display = 'block';
+        }
+    };
+
+    document.getElementById('passInput').oninput = (e) => {
+        const v = e.target.value.toLowerCase();
+        if(v === "familia2026" || v === "ticoadmin2026") {
+            localStorage.setItem('fa_key', v);
+            location.reload();
+        }
+    };
+    
+    window.salir = () => { localStorage.clear(); location.reload(); };
+
+    // 2. SUBIR FOTOS (Motor Directo)
+    document.getElementById('file').onchange = async (e) => {
+        const files = e.target.files;
+        if(files.length === 0) return;
+        
+        let u = localStorage.getItem('u_name') || prompt("Tu nombre:");
+        if(!u) return; localStorage.setItem('u_name', u);
+
+        const cat = document.getElementById('cat').value;
+        const txt = prompt("Mensaje:");
+        const btn = document.getElementById('btnUp');
+        const st = document.getElementById('status');
+        
+        btn.disabled = true; btn.innerText = "⏳ SUBIENDO...";
+        
+        try {
+            let urls = [];
+            for(let file of files) {
+                st.innerText = "Cargando...";
+                const fd = new FormData(); fd.append("image", file);
+                const req = await fetch(`https://api.imgbb.com/1/upload?key=${K}`, {method:"POST", body:fd});
+                const res = await req.json();
+                if(res.success) urls.push(res.data.url);
+            }
+            if(urls.length > 0) {
+                await addDoc(collection(db, "mensajes"), {
+                    texto: txt || "", fotos: urls, autor: u, categoria: cat, 
+                    fecha: new Date(), likesBy: [], comentarios: []
+                });
+                st.innerText = "✅ ¡Listo!";
+                setTimeout(() => { st.innerText=""; btn.disabled=false; btn.innerText="📸 SUBIR FOTO"; }, 2000);
+            }
+        } catch(err) { alert("Error"); btn.disabled=false; }
+    };
+
+    // 3. MURO
+    let fNow = "Todo";
+    let cache = [];
+
+    window.filt = (c) => {
+        fNow = c;
+        document.querySelectorAll('.chip').forEach(b => b.classList.toggle('active', b.id === 'btn-'+c));
+        pintar();
+    };
+
+    onSnapshot(query(collection(db, "mensajes"), orderBy("fecha", "desc")), snap => {
+        cache = snap.docs.map(d => ({id:d.id, ...d.data()}));
+        pintar();
+    });
+
+    window.move = (id, d) => {
+        const el = document.getElementById('t-'+id);
+        el.scrollBy({left: d * el.offsetWidth, behavior: 'smooth'});
+    };
+
+    function pintar() {
+        const box = document.getElementById('muro');
+        box.innerHTML = "";
+        const me = localStorage.getItem('u_name');
+        const admin = localStorage.getItem('fa_key') === "ticoadmin2026";
+        const list = cache.filter(p => fNow === "Todo" || p.categoria === fNow);
+
+        list.forEach(p => {
+            const pics = p.fotos || (p.foto ? [p.foto] : []);
+            const likes = p.likesBy || [];
+            const isLiked = likes.includes(me);
+            const coms = p.comentarios || [];
+
+            let galeria = `<img src="${pics[0]}" style="width:100%; border-radius:15px;">`;
+            
+            if(pics.length > 1) {
+                galeria = `
+                <div class="c-wrap">
+                    <button class="nav prev" onclick="window.move('${p.id}', -1)">❮</button>
+                    <div class="c-track" id="t-${p.id}" onscroll="window.dots('${p.id}')">
+                        ${pics.map(src=>`<img src="${src}">`).join('')}
+                    </div>
+                    <button class="nav next" onclick="window.move('${p.id}', 1)">❯</button>
+                </div>
+                <div class="dots" id="d-${p.id}">
+                    ${pics.map((_,i)=>`<div class="dot ${i===0?'active':''}"></div>`).join('')}
+                </div>`;
+            }
+
+            box.innerHTML += `
+            <div class="card">
+                <div class="head">
+                    <span style="font-weight:800; color:#3b82f6;">${p.autor} <small>(${p.categoria})</small></span>
+                    ${admin ? `<button class="trash" onclick="window.del('${p.id}')">🗑️ BORRAR</button>` : ''}
+                </div>
+                <p>${p.texto}</p>
+                ${galeria}
+                <button class="like ${isLiked?'yes':''}" onclick="window.lk('${p.id}')">
+                    <span>${isLiked?'❤️':'🤍'}</span> Me gusta (${likes.length})
+                </button>
+                <div style="background:#f1f5f9; padding:10px; border-radius:10px;">
+                    ${coms.map(c=>`<div style="font-size:12px; margin-bottom:5px;"><b>${c.autor}:</b> ${c.texto}</div>`).join('')}
+                    <div style="display:flex; gap:5px; margin-top:5px;">
+                        <input id="in-${p.id}" style="padding:5px; border-radius:5px; border:1px solid #ccc; width:70%;" placeholder="Opinar...">
+                        <button onclick="window.cm('${p.id}')" style="background:#3b82f6; color:white; border:none; border-radius:5px; width:25%;">OK</button>
+                    </div>
+                </div>
+            </div>`;
+        });
+    }
+
+    // 4. FUNCIONES GLOBALES
+    window.dots = (id) => {
+        const el = document.getElementById('t-'+id);
+        const i = Math.round(el.scrollLeft / el.offsetWidth);
+        const ds = document.getElementById('d-'+id).children;
+        for(let d of ds) d.classList.remove('active');
+        if(ds[i]) ds[i].classList.add('active');
+    };
+
+    window.lk = async (id) => {
+        const u = localStorage.getItem('u_name');
+        const ref = doc(db, "mensajes", id);
+        const sn = await getDoc(ref);
+        const ls = sn.data().likesBy || [];
+        if(ls.includes(u)) await updateDoc(ref, {likesBy: arrayRemove(u)});
+        else await updateDoc(ref, {likesBy: arrayUnion(u)});
+    };
+
+    window.cm = async (id) => {
+        const tx = document.getElementById('in-'+id).value;
+        const u = localStorage.getItem('u_name');
+        if(tx) await updateDoc(doc(db, "mensajes", id), {comentarios: arrayUnion({autor:u, texto:tx})});
+    };
+
+    window.del = async (id) => {
+        if(confirm("¿Eliminar?")) await deleteDoc(doc(db, "mensajes", id));
+    };
+</script>
+</body>
+</html>
