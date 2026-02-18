@@ -30,9 +30,7 @@
         .btn-out { background: var(--red); color: white; border: none; padding: 8px 15px; border-radius: 10px; font-weight: 800; cursor: pointer; }
 
         .container { max-width: 500px; margin: auto; padding: 15px; }
-
-        /* BOTÓN DE GESTIÓN ÚNICO */
-        .btn-admin { background: #f59e0b; border: none; padding: 8px 12px; border-radius: 10px; font-size: 16px; cursor: pointer; color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .btn-admin { background: #f59e0b; border: none; padding: 8px 12px; border-radius: 10px; font-size: 16px; cursor: pointer; color: white; }
 
         .card { background: white; border-radius: 25px; padding: 20px; margin-bottom: 25px; color: #0f172a; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
@@ -49,8 +47,11 @@
         .like.yes { color: var(--red) !important; }
         .like-names { font-size: 11px; color: var(--gray); margin-top: -8px; margin-bottom: 10px; display: block; }
 
+        /* COMENTARIOS */
         .com-box { background: #f1f5f9; padding: 10px; border-radius: 15px; margin-top: 10px; }
-        .com-item { font-size: 12px; margin-bottom: 8px; color: #334155; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; }
+        .com-item { font-size: 12px; margin-bottom: 8px; color: #334155; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
+        .com-del { color: var(--red); font-weight: 800; cursor: pointer; padding-left: 10px; font-size: 14px; }
+        
         .com-input-wrap { display: flex; gap: 5px; margin-top: 8px; }
         .com-input { flex: 1; padding: 10px; border-radius: 10px; border: 1px solid #cbd5e1; outline: none; }
         .com-btn { background: var(--blue); color: white; border: none; border-radius: 10px; padding: 0 15px; font-weight: 800; cursor: pointer; }
@@ -228,7 +229,12 @@
                     ${likes.length > 0 ? `<small class="like-names">A: ${likes.join(', ')}</small>` : ''}
                 </div>
                 <div class="com-box">
-                    ${coms.map(c => `<div class="com-item"><b>${c.autor || 'Alguien'}:</b> ${c.texto}</div>`).join('')}
+                    ${coms.map(c => `
+                        <div class="com-item">
+                            <span><b>${c.autor || 'Alguien'}:</b> ${c.texto}</span>
+                            ${admin ? `<span class="com-del" onclick="window.delCom('${p.id}','${c.autor}','${c.texto}')">×</span>` : ''}
+                        </div>
+                    `).join('')}
                     <div class="com-input-wrap">
                         <input id="in-${p.id}" class="com-input" placeholder="Comentar...">
                         <button class="com-btn" onclick="window.cm('${p.id}')">OK</button>
@@ -238,19 +244,25 @@
         });
     }
 
-    // NUEVO MENÚ DE GESTIÓN (EDITAR O BORRAR)
     window.menuAdmin = async (id) => {
-        const op = prompt("¿Qué desea hacer?\n1 - Editar texto\n2 - Borrar recuerdo\n(Escriba 1 o 2)");
-        
+        const op = prompt("¿Qué desea hacer?\n1 - Editar texto de la foto\n2 - Borrar foto completa\n(Escriba 1 o 2)");
         if (op === "1") {
             const ref = doc(db, "mensajes", id);
             const sn = await getDoc(ref);
             const nuevo = prompt("Editar mensaje:", sn.data().texto);
             if(nuevo !== null) await updateDoc(ref, {texto: nuevo});
         } else if (op === "2") {
-            if(confirm("¿Seguro que desea ELIMINAR este recuerdo para siempre?")) {
-                await deleteDoc(doc(db, "mensajes", id));
-            }
+            if(confirm("¿Seguro que desea ELIMINAR este recuerdo?")) await deleteDoc(doc(db, "mensajes", id));
+        }
+    };
+
+    // FUNCIÓN PARA BORRAR COMENTARIOS
+    window.delCom = async (postId, cAutor, cTexto) => {
+        if(confirm(`¿Borrar el comentario de ${cAutor}?`)) {
+            const ref = doc(db, "mensajes", postId);
+            await updateDoc(ref, {
+                comentarios: arrayRemove({autor: cAutor, texto: cTexto})
+            });
         }
     };
 
