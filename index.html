@@ -33,25 +33,25 @@
 
         .container { max-width: 500px; margin: auto; padding: 15px; }
 
-        /* BOTONES DE ACCIÓN (EDITAR/BORRAR) */
+        /* ADMIN BTNS */
         .admin-btns { display: flex; gap: 5px; }
         .btn-action { border: none; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer; color: white; }
         .btn-edit { background: #f59e0b; }
         .btn-del { background: var(--red); }
 
-        /* POSTS */
+        /* CARD */
         .card { background: white; border-radius: 25px; padding: 20px; margin-bottom: 25px; color: #0f172a; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         
-        .c-wrap { position: relative; margin: 10px -20px; background: #000; overflow: hidden; }
-        .c-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; }
+        .c-wrap { position: relative; margin: 10px -20px; background: #000; overflow: hidden; min-height: 200px; display: flex; align-items: center; }
+        .c-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; width: 100%; }
         .c-track img { width: 100%; flex-shrink: 0; scroll-snap-align: start; aspect-ratio: 1/1; object-fit: cover; cursor: zoom-in; }
         
         .nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.8); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10; font-weight: bold; border: none; }
         .prev { left: 10px; }
         .next { right: 10px; }
 
-        /* LIKES Y COMENTARIOS */
+        /* LIKES/COMS */
         .like { background: none; border: none; font-size: 16px; cursor: pointer; color: var(--gray); font-weight: 800; padding: 10px 0; display: flex; align-items: center; gap: 5px; }
         .like.yes { color: var(--red) !important; }
         .like-names { font-size: 11px; color: var(--gray); margin-top: -8px; margin-bottom: 10px; display: block; }
@@ -104,8 +104,7 @@
                 <option value="Viajes">✈️ Viajes</option>
                 <option value="Recuerdos">📜 Recuerdos</option>
             </select>
-            <button onclick="document.getElementById('file').click()" style="width:100%; background:var(--blue); color:white; border:none; padding:15px; border-radius:15px; font-weight:800;">📸 SUBIR RECUERDO</button>
-            <div id="status"></div>
+            <button onclick="document.getElementById('file').click()" id="btnUp" style="width:100%; background:var(--blue); color:white; border:none; padding:15px; border-radius:15px; font-weight:800;">📸 SUBIR RECUERDO</button>
         </div>
         <input type="file" id="file" style="display:none;" accept="image/*" multiple>
 
@@ -119,19 +118,17 @@
 
     const K = "07dd4f0a1180673510c5047ae8b5eec8"; 
 
-    // HELPERS
     window.zoom = (src) => { document.getElementById('zoom-img').src = src; document.getElementById('zoom-modal').style.display = 'flex'; };
     
     function getName() {
         let n = localStorage.getItem('u_name');
-        while(!n || n === "null" || n.trim() === "") {
-            n = prompt("Escribe tu nombre (Ej: Tico, Maria...):");
+        if(!n || n === "null" || n.trim() === "") {
+            n = prompt("Escribe tu nombre para participar:");
+            if(n) localStorage.setItem('u_name', n);
         }
-        localStorage.setItem('u_name', n);
-        return n;
+        return n || "Alguien";
     }
 
-    // LOGIN
     window.onload = () => {
         const a = localStorage.getItem('fa_key');
         if(a === "familia2026" || a === "ticoadmin2026") {
@@ -150,13 +147,14 @@
     
     window.salir = () => { localStorage.clear(); location.reload(); };
 
-    // SUBIR
     document.getElementById('file').onchange = async (e) => {
         const files = e.target.files;
         if(files.length === 0) return;
         const u = getName();
         const cat = document.getElementById('cat').value;
-        const txt = prompt("Describe este recuerdo:");
+        const txt = prompt("Mensaje de la foto:");
+        const btn = document.getElementById('btnUp');
+        btn.disabled = true; btn.innerText = "⏳ CARGANDO...";
         
         try {
             let urls = [];
@@ -169,10 +167,10 @@
                 texto: txt || "", fotos: urls, autor: u, categoria: cat, 
                 fecha: new Date(), likesBy: [], comentarios: []
             });
-        } catch(err) { alert("Error"); }
+            btn.disabled = false; btn.innerText = "📸 SUBIR RECUERDO";
+        } catch(err) { alert("Error al subir"); btn.disabled = false; }
     };
 
-    // MURO
     let fNow = "Todo";
     let cache = [];
 
@@ -200,21 +198,28 @@
         const list = cache.filter(p => fNow === "Todo" || p.categoria === fNow);
 
         list.forEach(p => {
-            const pics = p.fotos || [];
+            // SOPORTE PARA FOTOS VIEJAS Y NUEVAS
+            let pics = p.fotos || [];
+            if(pics.length === 0 && p.foto) pics = [p.foto];
+
             const likes = p.likesBy || [];
             const isLiked = likes.includes(me);
             const coms = p.comentarios || [];
 
-            let gal = `<img src="${pics[0]}" onclick="window.zoom('${pics[0]}')" style="width:100%; border-radius:15px; cursor:zoom-in;">`;
-            if(pics.length > 1) {
-                gal = `<div class="c-wrap">
-                    <button class="nav prev" onclick="window.move('${p.id}',-1)">❮</button>
-                    <div class="c-track" id="t-${p.id}" onscroll="window.dots('${p.id}')">
-                        ${pics.map(s => `<img src="${s}" onclick="window.zoom('${s}')">`).join('')}
+            let gal = `<div style="padding:20px; color:gray; text-align:center;">Cargando foto...</div>`;
+            if(pics.length > 0) {
+                if(pics.length === 1) {
+                    gal = `<img src="${pics[0]}" onclick="window.zoom('${pics[0]}')" style="width:100%; border-radius:15px; cursor:zoom-in;">`;
+                } else {
+                    gal = `<div class="c-wrap">
+                        <button class="nav prev" onclick="window.move('${p.id}',-1)">❮</button>
+                        <div class="c-track" id="t-${p.id}" onscroll="window.dots('${p.id}')">
+                            ${pics.map(s => `<img src="${s}" onclick="window.zoom('${s}')">`).join('')}
+                        </div>
+                        <button class="nav next" onclick="window.move('${p.id}',1)">❯</button>
                     </div>
-                    <button class="nav next" onclick="window.move('${p.id}',1)">❯</button>
-                </div>
-                <div class="dots" id="d-${p.id}">${pics.map((_,i)=>`<div class="dot ${i===0?'active':''}"></div>`).join('')}</div>`;
+                    <div class="dots" id="d-${p.id}">${pics.map((_,i)=>`<div class="dot ${i===0?'active':''}"></div>`).join('')}</div>`;
+                }
             }
 
             box.innerHTML += `
@@ -223,8 +228,8 @@
                     <span style="font-weight:800; color:var(--blue);">${p.autor} <small>(${p.categoria})</small></span>
                     <div class="admin-btns">
                         ${admin ? `
-                            <button class="btn-action btn-edit" onclick="window.edit('${p.id}')">EDITAR</button>
-                            <button class="btn-action btn-del" onclick="window.del('${p.id}')">BORRAR</button>
+                            <button class="btn-action btn-edit" onclick="window.edit('${p.id}')">✏️</button>
+                            <button class="btn-action btn-del" onclick="window.del('${p.id}')">🗑️</button>
                         ` : ''}
                     </div>
                 </div>
@@ -232,15 +237,12 @@
                 ${gal}
                 <div style="margin-top:10px;">
                     <button class="like ${isLiked?'yes':''}" onclick="window.lk('${p.id}')">
-                        <span>${isLiked?'❤️':'🤍'}</span> Me gusta (${likes.length})
+                        <span>${isLiked?'❤️':'🤍'}</span> (${likes.length})
                     </button>
                     ${likes.length > 0 ? `<small class="like-names">A: ${likes.join(', ')}</small>` : ''}
                 </div>
                 <div class="com-box">
-                    ${coms.map(c => {
-                        const autor = (c.autor && c.autor !== "null") ? c.autor : "Alguien";
-                        return `<div class="com-item"><b>${autor}:</b> ${c.texto}</div>`;
-                    }).join('')}
+                    ${coms.map(c => `<div class="com-item"><b>${c.autor || 'Alguien'}:</b> ${c.texto}</div>`).join('')}
                     <div class="com-input-wrap">
                         <input id="in-${p.id}" class="com-input" placeholder="Comentar...">
                         <button class="com-btn" onclick="window.cm('${p.id}')">OK</button>
@@ -250,7 +252,6 @@
         });
     }
 
-    // ACTIONS
     window.lk = async (id) => {
         const u = getName();
         const ref = doc(db, "mensajes", id);
@@ -276,7 +277,7 @@
     };
 
     window.del = async (id) => {
-        if(confirm("¿Borrar este recuerdo para siempre?")) await deleteDoc(doc(db, "mensajes", id));
+        if(confirm("¿Borrar para siempre?")) await deleteDoc(doc(db, "mensajes", id));
     };
 
     window.dots = (id) => {
