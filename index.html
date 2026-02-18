@@ -9,6 +9,7 @@
     <meta name="theme-color" content="#3b82f6">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Familia Yajure">
     <link rel="apple-touch-icon" href="https://img.icons8.com/emoji/192/house-with-garden.png">
     <link rel="icon" type="image/png" href="https://img.icons8.com/emoji/192/house-with-garden.png">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
@@ -17,45 +18,33 @@
         * { box-sizing: border-box; }
         :root { --blue: #3b82f6; --bg: #0f172a; --red: #ff0000; --gray: #64748b; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: var(--bg); color: white; overflow-x: hidden; }
-        
         #zoom-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 20000; align-items: center; justify-content: center; padding: 20px; }
         #zoom-modal img { max-width: 100%; max-height: 90vh; border-radius: 10px; }
         #zoom-modal .close { position: absolute; top: 20px; right: 20px; color: white; font-size: 40px; cursor: pointer; }
-
         #login-screen { position: fixed; inset: 0; background: url('https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&q=80&w=2070') no-repeat center center/cover; display: flex; align-items: flex-start; justify-content: center; z-index: 9999; padding-top: 80px; }
         .login-box { background: rgba(15, 23, 42, 0.95); padding: 40px; border-radius: 30px; text-align: center; width: 90%; max-width: 320px; border: 1px solid rgba(255,255,255,0.2); }
         .login-input { width: 100%; padding: 15px; border-radius: 15px; border: 2px solid var(--blue); background: #1e293b; color: white; text-align: center; font-size: 18px; margin-top: 20px; outline: none; }
-
         header { background: #1e293b; padding: 15px 20px; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
         .btn-out { background: var(--red); color: white; border: none; padding: 8px 15px; border-radius: 10px; font-weight: 800; cursor: pointer; }
-
         .container { max-width: 500px; margin: auto; padding: 15px; }
         .btn-admin { background: #f59e0b; border: none; padding: 8px 12px; border-radius: 10px; font-size: 16px; cursor: pointer; color: white; }
-
         .card { background: white; border-radius: 25px; padding: 20px; margin-bottom: 25px; color: #0f172a; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        
         .c-wrap { position: relative; margin: 10px -20px; background: #000; overflow: hidden; min-height: 200px; display: flex; align-items: center; }
         .c-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; width: 100%; }
         .c-track img { width: 100%; flex-shrink: 0; scroll-snap-align: start; aspect-ratio: 1/1; object-fit: cover; cursor: zoom-in; }
-        
         .nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.8); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10; font-weight: bold; border: none; }
         .prev { left: 10px; }
         .next { right: 10px; }
-
         .like { background: none; border: none; font-size: 16px; cursor: pointer; color: var(--gray); font-weight: 800; padding: 10px 0; display: flex; align-items: center; gap: 5px; }
         .like.yes { color: var(--red) !important; }
         .like-names { font-size: 11px; color: var(--gray); margin-top: -8px; margin-bottom: 10px; display: block; }
-
-        /* COMENTARIOS */
         .com-box { background: #f1f5f9; padding: 10px; border-radius: 15px; margin-top: 10px; }
         .com-item { font-size: 12px; margin-bottom: 8px; color: #334155; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
         .com-del { color: var(--red); font-weight: 800; cursor: pointer; padding-left: 10px; font-size: 14px; }
-        
         .com-input-wrap { display: flex; gap: 5px; margin-top: 8px; }
         .com-input { flex: 1; padding: 10px; border-radius: 10px; border: 1px solid #cbd5e1; outline: none; }
         .com-btn { background: var(--blue); color: white; border: none; border-radius: 10px; padding: 0 15px; font-weight: 800; cursor: pointer; }
-
         .scroll { overflow-x: auto; white-space: nowrap; padding-bottom: 15px; display: flex; gap: 10px; }
         .chip { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 20px; cursor: pointer; }
         .chip.active { background: var(--blue); border-color: var(--blue); }
@@ -101,7 +90,6 @@
             <button onclick="document.getElementById('file').click()" id="btnUp" style="width:100%; background:var(--blue); color:white; border:none; padding:15px; border-radius:15px; font-weight:800;">📸 SUBIR RECUERDO</button>
         </div>
         <input type="file" id="file" style="display:none;" accept="image/*" multiple>
-
         <div id="muro"></div>
     </div>
 </div>
@@ -109,11 +97,8 @@
 <script type="module">
     import { db } from "./firebase.js";
     import { collection, addDoc, query, orderBy, onSnapshot, updateDoc, doc, arrayUnion, arrayRemove, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
     const K = "07dd4f0a1180673510c5047ae8b5eec8"; 
-
     window.zoom = (src) => { document.getElementById('zoom-img').src = src; document.getElementById('zoom-modal').style.display = 'flex'; };
-    
     function getName() {
         let n = localStorage.getItem('u_name');
         if(!n || n === "null" || n.trim() === "") {
@@ -122,7 +107,6 @@
         }
         return n || "Alguien";
     }
-
     window.onload = () => {
         const a = localStorage.getItem('fa_key');
         if(a === "familia2026" || a === "ticoadmin2026") {
@@ -130,7 +114,6 @@
             document.getElementById('app-content').style.display = 'block';
         }
     };
-
     document.getElementById('passInput').oninput = (e) => {
         const v = e.target.value.toLowerCase();
         if(v === "familia2026" || v === "ticoadmin2026") {
@@ -138,9 +121,7 @@
             location.reload();
         }
     };
-    
     window.salir = () => { localStorage.clear(); location.reload(); };
-
     document.getElementById('file').onchange = async (e) => {
         const files = e.target.files;
         if(files.length === 0) return;
@@ -149,7 +130,6 @@
         const txt = prompt("Mensaje de la foto:");
         const btn = document.getElementById('btnUp');
         btn.disabled = true; btn.innerText = "⏳ CARGANDO...";
-        
         try {
             let urls = [];
             for(let f of files) {
@@ -157,139 +137,44 @@
                 const res = await fetch(`https://api.imgbb.com/1/upload?key=${K}`, {method:"POST", body:fd}).then(r => r.json());
                 if(res.success) urls.push(res.data.url);
             }
-            await addDoc(collection(db, "mensajes"), {
-                texto: txt || "", fotos: urls, autor: u, categoria: cat, 
-                fecha: new Date(), likesBy: [], comentarios: []
-            });
+            await addDoc(collection(db, "mensajes"), { texto: txt || "", fotos: urls, autor: u, categoria: cat, fecha: new Date(), likesBy: [], comentarios: [] });
             btn.disabled = false; btn.innerText = "📸 SUBIR RECUERDO";
         } catch(err) { alert("Error"); btn.disabled = false; }
     };
-
     let fNow = "Todo";
     let cache = [];
-
-    window.filt = (c) => {
-        fNow = c;
-        document.querySelectorAll('.chip').forEach(b => b.classList.toggle('active', b.id === 'btn-'+c));
-        pintar();
-    };
-
-    onSnapshot(query(collection(db, "mensajes"), orderBy("fecha", "desc")), snap => {
-        cache = snap.docs.map(d => ({id:d.id, ...d.data()}));
-        pintar();
-    });
-
-    window.move = (id, d) => {
-        const el = document.getElementById('t-'+id);
-        el.scrollBy({left: d * el.offsetWidth, behavior: 'smooth'});
-    };
-
+    window.filt = (c) => { fNow = c; document.querySelectorAll('.chip').forEach(b => b.classList.toggle('active', b.id === 'btn-'+c)); pintar(); };
+    onSnapshot(query(collection(db, "mensajes"), orderBy("fecha", "desc")), snap => { cache = snap.docs.map(d => ({id:d.id, ...d.data()})); pintar(); });
+    window.move = (id, d) => { const el = document.getElementById('t-'+id); el.scrollBy({left: d * el.offsetWidth, behavior: 'smooth'}); };
     function pintar() {
         const box = document.getElementById('muro');
         box.innerHTML = "";
         const me = localStorage.getItem('u_name');
         const admin = localStorage.getItem('fa_key') === "ticoadmin2026";
         const list = cache.filter(p => fNow === "Todo" || p.categoria === fNow);
-
         list.forEach(p => {
             let pics = p.fotos || [];
             if(pics.length === 0 && p.foto) pics = [p.foto];
             const likes = p.likesBy || [];
             const isLiked = likes.includes(me);
             const coms = p.comentarios || [];
-
-            let gal = `<div style="padding:20px; color:gray; text-align:center;">Cargando foto...</div>`;
+            let gal = `<div style="padding:20px; color:gray; text-align:center;">Cargando...</div>`;
             if(pics.length > 0) {
-                if(pics.length === 1) {
-                    gal = `<img src="${pics[0]}" onclick="window.zoom('${pics[0]}')" style="width:100%; border-radius:15px; cursor:zoom-in;">`;
-                } else {
-                    gal = `<div class="c-wrap">
-                        <button class="nav prev" onclick="window.move('${p.id}',-1)">❮</button>
-                        <div class="c-track" id="t-${p.id}" onscroll="window.dots('${p.id}')">
-                            ${pics.map(s => `<img src="${s}" onclick="window.zoom('${s}')">`).join('')}
-                        </div>
-                        <button class="nav next" onclick="window.move('${p.id}',1)">❯</button>
-                    </div>
-                    <div class="dots" id="d-${p.id}">${pics.map((_,i)=>`<div class="dot ${i===0?'active':''}"></div>`).join('')}</div>`;
-                }
+                if(pics.length === 1) gal = `<img src="${pics[0]}" onclick="window.zoom('${pics[0]}')" style="width:100%; border-radius:15px; cursor:zoom-in;">`;
+                else gal = `<div class="c-wrap"><button class="nav prev" onclick="window.move('${p.id}',-1)">❮</button><div class="c-track" id="t-${p.id}" onscroll="window.dots('${p.id}')">${pics.map(s => `<img src="${s}" onclick="window.zoom('${s}')">`).join('')}</div><button class="nav next" onclick="window.move('${p.id}',1)">❯</button></div><div class="dots" id="d-${p.id}">${pics.map((_,i)=>`<div class="dot ${i===0?'active':''}"></div>`).join('')}</div>`;
             }
-
-            box.innerHTML += `
-            <div class="card">
-                <div class="head">
-                    <span style="font-weight:800; color:var(--blue);">${p.autor} <small>(${p.categoria})</small></span>
-                    ${admin ? `<button class="btn-admin" onclick="window.menuAdmin('${p.id}')">⚙️</button>` : ''}
-                </div>
-                <p style="margin:10px 0;">${p.texto}</p>
-                ${gal}
-                <div style="margin-top:10px;">
-                    <button class="like ${isLiked?'yes':''}" onclick="window.lk('${p.id}')">
-                        <span>${isLiked?'❤️':'🤍'}</span> (${likes.length})
-                    </button>
-                    ${likes.length > 0 ? `<small class="like-names">A: ${likes.join(', ')}</small>` : ''}
-                </div>
-                <div class="com-box">
-                    ${coms.map(c => `
-                        <div class="com-item">
-                            <span><b>${c.autor || 'Alguien'}:</b> ${c.texto}</span>
-                            ${admin ? `<span class="com-del" onclick="window.delCom('${p.id}','${c.autor}','${c.texto}')">×</span>` : ''}
-                        </div>
-                    `).join('')}
-                    <div class="com-input-wrap">
-                        <input id="in-${p.id}" class="com-input" placeholder="Comentar...">
-                        <button class="com-btn" onclick="window.cm('${p.id}')">OK</button>
-                    </div>
-                </div>
-            </div>`;
+            box.innerHTML += `<div class="card"><div class="head"><span style="font-weight:800; color:var(--blue);">${p.autor} <small>(${p.categoria})</small></span>${admin ? `<button class="btn-admin" onclick="window.menuAdmin('${p.id}')">⚙️</button>` : ''}</div><p style="margin:10px 0;">${p.texto}</p>${gal}<div style="margin-top:10px;"><button class="like ${isLiked?'yes':''}" onclick="window.lk('${p.id}')"><span>${isLiked?'❤️':'🤍'}</span> (${likes.length})</button>${likes.length > 0 ? `<small class="like-names">A: ${likes.join(', ')}</small>` : ''}</div><div class="com-box">${coms.map(c => `<div class="com-item"><span><b>${c.autor || 'Alguien'}:</b> ${c.texto}</span>${admin ? `<span class="com-del" onclick="window.delCom('${p.id}','${c.autor}','${c.texto}')">×</span>` : ''}</div>`).join('')}<div class="com-input-wrap"><input id="in-${p.id}" class="com-input" placeholder="Comentar..."><button class="com-btn" onclick="window.cm('${p.id}')">OK</button></div></div></div>`;
         });
     }
-
     window.menuAdmin = async (id) => {
-        const op = prompt("¿Qué desea hacer?\n1 - Editar texto de la foto\n2 - Borrar foto completa\n(Escriba 1 o 2)");
-        if (op === "1") {
-            const ref = doc(db, "mensajes", id);
-            const sn = await getDoc(ref);
-            const nuevo = prompt("Editar mensaje:", sn.data().texto);
-            if(nuevo !== null) await updateDoc(ref, {texto: nuevo});
-        } else if (op === "2") {
-            if(confirm("¿Seguro que desea ELIMINAR este recuerdo?")) await deleteDoc(doc(db, "mensajes", id));
-        }
+        const op = prompt("¿Qué desea hacer?\n1 - Editar texto\n2 - Borrar foto\n(Escriba 1 o 2)");
+        if (op === "1") { const ref = doc(db, "mensajes", id); const sn = await getDoc(ref); const nuevo = prompt("Editar mensaje:", sn.data().texto); if(nuevo !== null) await updateDoc(ref, {texto: nuevo}); }
+        else if (op === "2") { if(confirm("¿Borrar?")) await deleteDoc(doc(db, "mensajes", id)); }
     };
-
-    // FUNCIÓN PARA BORRAR COMENTARIOS
-    window.delCom = async (postId, cAutor, cTexto) => {
-        if(confirm(`¿Borrar el comentario de ${cAutor}?`)) {
-            const ref = doc(db, "mensajes", postId);
-            await updateDoc(ref, {
-                comentarios: arrayRemove({autor: cAutor, texto: cTexto})
-            });
-        }
-    };
-
-    window.lk = async (id) => {
-        const u = getName();
-        const ref = doc(db, "mensajes", id);
-        const sn = await getDoc(ref);
-        const ls = sn.data().likesBy || [];
-        if(ls.includes(u)) await updateDoc(ref, {likesBy: arrayRemove(u)});
-        else await updateDoc(ref, {likesBy: arrayUnion(u)});
-    };
-
-    window.cm = async (id) => {
-        const tx = document.getElementById('in-'+id).value;
-        if(!tx) return;
-        const u = getName();
-        await updateDoc(doc(db, "mensajes", id), { comentarios: arrayUnion({autor: u, texto: tx}) });
-        document.getElementById('in-'+id).value = "";
-    };
-
-    window.dots = (id) => {
-        const el = document.getElementById('t-'+id);
-        const i = Math.round(el.scrollLeft / el.offsetWidth);
-        const ds = document.getElementById('d-'+id).children;
-        for(let d of ds) d.classList.remove('active');
-        if(ds[i]) ds[i].classList.add('active');
-    };
+    window.delCom = async (postId, cAutor, cTexto) => { if(confirm(`¿Borrar comentario?`)) { const ref = doc(db, "mensajes", postId); await updateDoc(ref, { comentarios: arrayRemove({autor: cAutor, texto: cTexto}) }); } };
+    window.lk = async (id) => { const u = getName(); const ref = doc(db, "mensajes", id); const sn = await getDoc(ref); const ls = sn.data().likesBy || []; if(ls.includes(u)) await updateDoc(ref, {likesBy: arrayRemove(u)}); else await updateDoc(ref, {likesBy: arrayUnion(u)}); };
+    window.cm = async (id) => { const tx = document.getElementById('in-'+id).value; if(!tx) return; const u = getName(); await updateDoc(doc(db, "mensajes", id), { comentarios: arrayUnion({autor: u, texto: tx}) }); document.getElementById('in-'+id).value = ""; };
+    window.dots = (id) => { const el = document.getElementById('t-'+id); const i = Math.round(el.scrollLeft / el.offsetWidth); const ds = document.getElementById('d-'+id).children; for(let d of ds) d.classList.remove('active'); if(ds[i]) ds[i].classList.add('active'); };
 </script>
 </body>
 </html>
