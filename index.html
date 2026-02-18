@@ -18,12 +18,10 @@
         :root { --blue: #3b82f6; --bg: #0f172a; --red: #ff0000; --gray: #64748b; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: var(--bg); color: white; overflow-x: hidden; }
         
-        /* ZOOM MODAL */
         #zoom-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 20000; align-items: center; justify-content: center; padding: 20px; }
         #zoom-modal img { max-width: 100%; max-height: 90vh; border-radius: 10px; }
         #zoom-modal .close { position: absolute; top: 20px; right: 20px; color: white; font-size: 40px; cursor: pointer; }
 
-        /* LOGIN */
         #login-screen { position: fixed; inset: 0; background: url('https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&q=80&w=2070') no-repeat center center/cover; display: flex; align-items: flex-start; justify-content: center; z-index: 9999; padding-top: 80px; }
         .login-box { background: rgba(15, 23, 42, 0.95); padding: 40px; border-radius: 30px; text-align: center; width: 90%; max-width: 320px; border: 1px solid rgba(255,255,255,0.2); }
         .login-input { width: 100%; padding: 15px; border-radius: 15px; border: 2px solid var(--blue); background: #1e293b; color: white; text-align: center; font-size: 18px; margin-top: 20px; outline: none; }
@@ -33,13 +31,9 @@
 
         .container { max-width: 500px; margin: auto; padding: 15px; }
 
-        /* ADMIN BTNS */
-        .admin-btns { display: flex; gap: 5px; }
-        .btn-action { border: none; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer; color: white; }
-        .btn-edit { background: #f59e0b; }
-        .btn-del { background: var(--red); }
+        /* BOTÓN DE GESTIÓN ÚNICO */
+        .btn-admin { background: #f59e0b; border: none; padding: 8px 12px; border-radius: 10px; font-size: 16px; cursor: pointer; color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
 
-        /* CARD */
         .card { background: white; border-radius: 25px; padding: 20px; margin-bottom: 25px; color: #0f172a; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         
@@ -51,7 +45,6 @@
         .prev { left: 10px; }
         .next { right: 10px; }
 
-        /* LIKES/COMS */
         .like { background: none; border: none; font-size: 16px; cursor: pointer; color: var(--gray); font-weight: 800; padding: 10px 0; display: flex; align-items: center; gap: 5px; }
         .like.yes { color: var(--red) !important; }
         .like-names { font-size: 11px; color: var(--gray); margin-top: -8px; margin-bottom: 10px; display: block; }
@@ -123,7 +116,7 @@
     function getName() {
         let n = localStorage.getItem('u_name');
         if(!n || n === "null" || n.trim() === "") {
-            n = prompt("Escribe tu nombre para participar:");
+            n = prompt("Escribe tu nombre:");
             if(n) localStorage.setItem('u_name', n);
         }
         return n || "Alguien";
@@ -168,7 +161,7 @@
                 fecha: new Date(), likesBy: [], comentarios: []
             });
             btn.disabled = false; btn.innerText = "📸 SUBIR RECUERDO";
-        } catch(err) { alert("Error al subir"); btn.disabled = false; }
+        } catch(err) { alert("Error"); btn.disabled = false; }
     };
 
     let fNow = "Todo";
@@ -198,10 +191,8 @@
         const list = cache.filter(p => fNow === "Todo" || p.categoria === fNow);
 
         list.forEach(p => {
-            // SOPORTE PARA FOTOS VIEJAS Y NUEVAS
             let pics = p.fotos || [];
             if(pics.length === 0 && p.foto) pics = [p.foto];
-
             const likes = p.likesBy || [];
             const isLiked = likes.includes(me);
             const coms = p.comentarios || [];
@@ -226,12 +217,7 @@
             <div class="card">
                 <div class="head">
                     <span style="font-weight:800; color:var(--blue);">${p.autor} <small>(${p.categoria})</small></span>
-                    <div class="admin-btns">
-                        ${admin ? `
-                            <button class="btn-action btn-edit" onclick="window.edit('${p.id}')">✏️</button>
-                            <button class="btn-action btn-del" onclick="window.del('${p.id}')">🗑️</button>
-                        ` : ''}
-                    </div>
+                    ${admin ? `<button class="btn-admin" onclick="window.menuAdmin('${p.id}')">⚙️</button>` : ''}
                 </div>
                 <p style="margin:10px 0;">${p.texto}</p>
                 ${gal}
@@ -252,6 +238,22 @@
         });
     }
 
+    // NUEVO MENÚ DE GESTIÓN (EDITAR O BORRAR)
+    window.menuAdmin = async (id) => {
+        const op = prompt("¿Qué desea hacer?\n1 - Editar texto\n2 - Borrar recuerdo\n(Escriba 1 o 2)");
+        
+        if (op === "1") {
+            const ref = doc(db, "mensajes", id);
+            const sn = await getDoc(ref);
+            const nuevo = prompt("Editar mensaje:", sn.data().texto);
+            if(nuevo !== null) await updateDoc(ref, {texto: nuevo});
+        } else if (op === "2") {
+            if(confirm("¿Seguro que desea ELIMINAR este recuerdo para siempre?")) {
+                await deleteDoc(doc(db, "mensajes", id));
+            }
+        }
+    };
+
     window.lk = async (id) => {
         const u = getName();
         const ref = doc(db, "mensajes", id);
@@ -267,17 +269,6 @@
         const u = getName();
         await updateDoc(doc(db, "mensajes", id), { comentarios: arrayUnion({autor: u, texto: tx}) });
         document.getElementById('in-'+id).value = "";
-    };
-
-    window.edit = async (id) => {
-        const ref = doc(db, "mensajes", id);
-        const sn = await getDoc(ref);
-        const nuevo = prompt("Editar mensaje:", sn.data().texto);
-        if(nuevo !== null) await updateDoc(ref, {texto: nuevo});
-    };
-
-    window.del = async (id) => {
-        if(confirm("¿Borrar para siempre?")) await deleteDoc(doc(db, "mensajes", id));
     };
 
     window.dots = (id) => {
