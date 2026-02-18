@@ -9,10 +9,8 @@
     <meta name="theme-color" content="#3b82f6">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Familia Yajure">
     <link rel="apple-touch-icon" href="https://img.icons8.com/emoji/192/house-with-garden.png">
     <link rel="icon" type="image/png" href="https://img.icons8.com/emoji/192/house-with-garden.png">
-
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     
     <style>
@@ -20,12 +18,10 @@
         :root { --blue: #3b82f6; --bg: #0f172a; --red: #ff0000; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: var(--bg); color: white; overflow-x: hidden; }
         
-        /* BANNER DE INSTALACIÓN (Para la familia impaciente) */
-        #install-banner { 
-            display: none; background: var(--blue); padding: 15px; text-align: center; 
-            position: fixed; bottom: 0; width: 100%; z-index: 10000; border-radius: 20px 20px 0 0;
-            box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
-        }
+        /* MODAL PARA AMPLIAR FOTOS */
+        #zoom-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 20000; align-items: center; justify-content: center; padding: 20px; }
+        #zoom-modal img { max-width: 100%; max-height: 90vh; border-radius: 10px; box-shadow: 0 0 30px rgba(255,255,255,0.2); }
+        #zoom-modal .close { position: absolute; top: 20px; right: 20px; color: white; font-size: 40px; cursor: pointer; font-weight: bold; }
 
         #login-screen { position: fixed; inset: 0; background: url('https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&q=80&w=2070') no-repeat center center/cover; display: flex; align-items: flex-start; justify-content: center; z-index: 9999; padding-top: 80px; }
         .login-box { background: rgba(15, 23, 42, 0.95); padding: 40px; border-radius: 30px; text-align: center; width: 90%; max-width: 320px; border: 1px solid rgba(255,255,255,0.2); }
@@ -49,7 +45,7 @@
         
         .c-wrap { position: relative; margin: 10px -20px; background: #000; overflow: hidden; }
         .c-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; }
-        .c-track img { width: 100%; flex-shrink: 0; scroll-snap-align: start; aspect-ratio: 1/1; object-fit: cover; }
+        .c-track img { width: 100%; flex-shrink: 0; scroll-snap-align: start; aspect-ratio: 1/1; object-fit: cover; cursor: zoom-in; }
         
         .nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.8); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10; font-weight: bold; color: black; border: none; }
         .prev { left: 10px; }
@@ -62,18 +58,19 @@
         .trash { background: var(--red); color: white; border: none; padding: 8px 15px; border-radius: 8px; font-size: 12px; cursor: pointer; font-weight: 800; }
         .like { background: none; border: none; font-size: 16px; cursor: pointer; color: #64748b; font-weight: 800; padding: 10px 0; display: flex; align-items: center; gap: 5px; }
         .like.yes { color: #ff0000 !important; }
+        .like-names { font-size: 11px; color: #64748b; margin-top: -5px; margin-bottom: 10px; display: block; }
 
         .com-box { background: #f1f5f9; padding: 10px; border-radius: 10px; margin-top: 10px; }
+        .com-item { font-size: 12px; margin-bottom: 8px; padding-bottom: 5px; border-bottom: 1px solid #e2e8f0; color: #334155; }
         .com-input { width: 70%; padding: 10px; border-radius: 10px; border: 1px solid #cbd5e1; background: white; color: #334155; outline: none; }
         .com-btn { width: 25%; background: var(--blue); color: white; border: none; border-radius: 10px; font-weight: 800; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div id="install-banner">
-    <p style="margin:0 0 10px 0; font-weight:800;">¿Quieres instalar la App en tu celular?</p>
-    <button onclick="window.installApp()" style="background:white; color:black; border:none; padding:10px 20px; border-radius:10px; font-weight:800;">INSTALAR 🏡</button>
-    <button onclick="document.getElementById('install-banner').style.display='none'" style="background:none; color:white; border:none; margin-left:10px;">Después</button>
+<div id="zoom-modal" onclick="this.style.display='none'">
+    <span class="close">&times;</span>
+    <img id="zoom-img" src="">
 </div>
 
 <div id="login-screen">
@@ -86,7 +83,7 @@
 
 <div id="app-content" style="display:none;">
     <header>
-        <span style="font-weight: 800;">Recuerdos</span>
+        <span style="font-weight: 800;">Recuerdos 📸</span>
         <button onclick="window.salir()" class="btn-out">Salir 🔒</button>
     </header>
 
@@ -123,24 +120,10 @@
 
     const K = "07dd4f0a1180673510c5047ae8b5eec8"; 
 
-    // LÓGICA DE INSTALACIÓN AUTOMÁTICA
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        document.getElementById('install-banner').style.display = 'block';
-    });
-
-    window.installApp = async () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') console.log('Instalada');
-            deferredPrompt = null;
-            document.getElementById('install-banner').style.display = 'none';
-        } else {
-            alert("Para instalar: Toca los 3 puntos (o compartir) y selecciona 'Agregar a pantalla de inicio'");
-        }
+    // FUNCION ZOOM
+    window.zoom = (src) => {
+        document.getElementById('zoom-img').src = src;
+        document.getElementById('zoom-modal').style.display = 'flex';
     };
 
     // LOGIN
@@ -167,7 +150,8 @@
         const files = e.target.files;
         if(files.length === 0) return;
         
-        let u = localStorage.getItem('u_name') || prompt("Tu nombre:");
+        let u = localStorage.getItem('u_name');
+        if(!u || u === "null") u = prompt("Tu nombre:");
         if(!u) return; localStorage.setItem('u_name', u);
 
         const cat = document.getElementById('cat').value;
@@ -175,7 +159,7 @@
         const btn = document.getElementById('btnUp');
         const st = document.getElementById('status');
         
-        btn.disabled = true; btn.innerText = "⏳ SUBIENDO...";
+        btn.disabled = true; btn.innerText = "⏳ CARGANDO...";
         
         try {
             let urls = [];
@@ -193,7 +177,7 @@
                 st.innerText = "✅ ¡Listo!";
                 setTimeout(() => { st.innerText=""; btn.disabled=false; btn.innerText="📸 SUBIR FOTO"; }, 2000);
             }
-        } catch(err) { alert("Error"); btn.disabled=false; }
+        } catch(err) { alert("Error al subir"); btn.disabled=false; }
     };
 
     // MURO
@@ -224,18 +208,18 @@
         const list = cache.filter(p => fNow === "Todo" || p.categoria === fNow);
 
         list.forEach(p => {
-            const pics = p.fotos || [p.foto];
+            const pics = p.fotos || (p.foto ? [p.foto] : []);
             const likes = p.likesBy || [];
             const isLiked = likes.includes(me);
             const coms = p.comentarios || [];
 
-            let galeria = `<img src="${pics[0]}" style="width:100%; border-radius:15px;">`;
+            let galeria = `<img src="${pics[0]}" onclick="window.zoom('${pics[0]}')" style="width:100%; border-radius:15px; cursor:zoom-in;">`;
             if(pics.length > 1) {
                 galeria = `
                 <div class="c-wrap">
                     <button class="nav prev" onclick="window.move('${p.id}', -1)">❮</button>
                     <div class="c-track" id="t-${p.id}" onscroll="window.dots('${p.id}')">
-                        ${pics.map(src=>`<img src="${src}">`).join('')}
+                        ${pics.map(src=>`<img src="${src}" onclick="window.zoom('${src}')">`).join('')}
                     </div>
                     <button class="nav next" onclick="window.move('${p.id}', 1)">❯</button>
                 </div>
@@ -248,17 +232,20 @@
             <div class="card">
                 <div class="head">
                     <span style="font-weight:800; color:#3b82f6;">${p.autor} <small>(${p.categoria})</small></span>
-                    ${admin ? `<button class="trash" onclick="window.del('${p.id}')">🗑️ BORRAR</button>` : ''}
+                    ${admin ? `<button class="trash" onclick="window.del('${p.id}')">🗑️</button>` : ''}
                 </div>
-                <p>${p.texto}</p>
+                <p style="margin: 10px 0;">${p.texto}</p>
                 ${galeria}
-                <button class="like ${isLiked?'yes':''}" onclick="window.lk('${p.id}')">
-                    <span>${isLiked?'❤️':'🤍'}</span> Me gusta (${likes.length})
-                </button>
+                <div style="margin-top:10px;">
+                    <button class="like ${isLiked?'yes':''}" onclick="window.lk('${p.id}')">
+                        <span>${isLiked?'❤️':'🤍'}</span> Me gusta (${likes.length})
+                    </button>
+                    ${likes.length > 0 ? `<small class="like-names">A: ${likes.join(', ')}</small>` : ''}
+                </div>
                 <div class="com-box">
-                    ${coms.map(c=>`<div style="font-size:12px; margin-bottom:5px;"><b>${c.autor}:</b> ${c.texto}</div>`).join('')}
+                    ${coms.map(c=>`<div class="com-item"><b>${c.autor || 'Alguien'}:</b> ${c.texto}</div>`).join('')}
                     <div style="display:flex; gap:5px; margin-top:5px;">
-                        <input id="in-${p.id}" class="com-input" placeholder="Comentar...">
+                        <input id="in-${p.id}" class="com-input" placeholder="Escribe un comentario...">
                         <button class="com-btn" onclick="window.cm('${p.id}')">OK</button>
                     </div>
                 </div>
@@ -276,7 +263,10 @@
     };
 
     window.lk = async (id) => {
-        const u = localStorage.getItem('u_name');
+        let u = localStorage.getItem('u_name');
+        if(!u || u === "null") u = prompt("Tu nombre:");
+        if(!u) return; localStorage.setItem('u_name', u);
+
         const ref = doc(db, "mensajes", id);
         const sn = await getDoc(ref);
         const ls = sn.data().likesBy || [];
@@ -286,12 +276,20 @@
 
     window.cm = async (id) => {
         const tx = document.getElementById('in-'+id).value;
-        const u = localStorage.getItem('u_name');
-        if(tx) await updateDoc(doc(db, "mensajes", id), {comentarios: arrayUnion({autor:u, texto:tx})});
+        if(!tx) return;
+        
+        let u = localStorage.getItem('u_name');
+        if(!u || u === "null") u = prompt("Tu nombre para comentar:");
+        if(!u) return; localStorage.setItem('u_name', u);
+
+        await updateDoc(doc(db, "mensajes", id), {
+            comentarios: arrayUnion({autor: u, texto: tx})
+        });
+        document.getElementById('in-'+id).value = "";
     };
 
     window.del = async (id) => {
-        if(confirm("¿Eliminar?")) await deleteDoc(doc(db, "mensajes", id));
+        if(confirm("¿Seguro que quieres borrar este recuerdo?")) await deleteDoc(doc(db, "mensajes", id));
     };
 </script>
 </body>
