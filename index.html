@@ -3,8 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>Familia Yajure - Oficial</title>
+    <title>Familia Yajure</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#3b82f6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Familia Yajure">
+    <link rel="apple-touch-icon" href="https://img.icons8.com/emoji/192/house-with-garden.png">
     <link rel="icon" type="image/png" href="https://img.icons8.com/emoji/192/house-with-garden.png">
+
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     
     <style>
@@ -12,36 +20,33 @@
         :root { --blue: #3b82f6; --bg: #0f172a; --red: #ff0000; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: var(--bg); color: white; overflow-x: hidden; }
         
-        /* LOGIN */
+        /* BANNER DE INSTALACIÓN (Para la familia impaciente) */
+        #install-banner { 
+            display: none; background: var(--blue); padding: 15px; text-align: center; 
+            position: fixed; bottom: 0; width: 100%; z-index: 10000; border-radius: 20px 20px 0 0;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
+        }
+
         #login-screen { position: fixed; inset: 0; background: url('https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&q=80&w=2070') no-repeat center center/cover; display: flex; align-items: flex-start; justify-content: center; z-index: 9999; padding-top: 80px; }
         .login-box { background: rgba(15, 23, 42, 0.95); padding: 40px; border-radius: 30px; text-align: center; width: 90%; max-width: 320px; border: 1px solid rgba(255,255,255,0.2); }
-        
-        /* INPUT DEL LOGIN (OSCURO) */
         .login-input { width: 100%; padding: 15px; border-radius: 15px; border: 2px solid var(--blue); background: #1e293b; color: white; text-align: center; font-size: 18px; margin-top: 20px; outline: none; }
 
-        /* HEADER */
         header { background: #1e293b; padding: 15px 20px; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
         .btn-out { background: var(--red); color: white; border: none; padding: 8px 15px; border-radius: 10px; font-weight: 800; cursor: pointer; }
 
         .container { max-width: 500px; margin: auto; padding: 15px; }
 
-        /* FILTROS */
         .scroll { overflow-x: auto; white-space: nowrap; padding-bottom: 15px; display: flex; gap: 10px; }
-        .scroll::-webkit-scrollbar { height: 5px; display: block; }
-        .scroll::-webkit-scrollbar-thumb { background: var(--blue); border-radius: 10px; }
         .chip { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: 600; }
         .chip.active { background: var(--blue); border-color: var(--blue); }
 
-        /* UPLOAD */
         .upload { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 25px; border: 2px dashed rgba(255,255,255,0.2); margin-bottom: 25px; text-align: center; }
         .sel { width: 100%; padding: 12px; border-radius: 12px; margin-bottom: 10px; font-weight: 800; background: white; color: black; border: none; }
         .btn-up { background: var(--blue); color: white; width: 100%; padding: 15px; border-radius: 15px; font-weight: 800; border: none; cursor: pointer; }
 
-        /* POSTS */
         .card { background: white; border-radius: 25px; padding: 20px; margin-bottom: 25px; color: #0f172a; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         
-        /* CARRUSEL Y FLECHAS */
         .c-wrap { position: relative; margin: 10px -20px; background: #000; overflow: hidden; }
         .c-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; }
         .c-track img { width: 100%; flex-shrink: 0; scroll-snap-align: start; aspect-ratio: 1/1; object-fit: cover; }
@@ -54,27 +59,22 @@
         .dot { width: 8px; height: 8px; border-radius: 50%; background: #ccc; }
         .dot.active { background: var(--blue); }
 
-        /* ACCIONES */
-        .trash { background: var(--red); color: white; border: none; padding: 8px 15px; border-radius: 8px; font-size: 12px; cursor: pointer; font-weight: 800; box-shadow: 0 4px 10px rgba(255,0,0,0.3); }
+        .trash { background: var(--red); color: white; border: none; padding: 8px 15px; border-radius: 8px; font-size: 12px; cursor: pointer; font-weight: 800; }
         .like { background: none; border: none; font-size: 16px; cursor: pointer; color: #64748b; font-weight: 800; padding: 10px 0; display: flex; align-items: center; gap: 5px; }
         .like.yes { color: #ff0000 !important; }
-        .like.yes span { color: #ff0000 !important; }
 
-        /* CAJA DE COMENTARIOS MEJORADA (BLANCA) */
         .com-box { background: #f1f5f9; padding: 10px; border-radius: 10px; margin-top: 10px; }
-        .com-input { 
-            width: 70%; 
-            padding: 10px; 
-            border-radius: 10px; 
-            border: 1px solid #cbd5e1; 
-            background: white !important; 
-            color: #334155 !important;
-            outline: none;
-        }
+        .com-input { width: 70%; padding: 10px; border-radius: 10px; border: 1px solid #cbd5e1; background: white; color: #334155; outline: none; }
         .com-btn { width: 25%; background: var(--blue); color: white; border: none; border-radius: 10px; font-weight: 800; cursor: pointer; }
     </style>
 </head>
 <body>
+
+<div id="install-banner">
+    <p style="margin:0 0 10px 0; font-weight:800;">¿Quieres instalar la App en tu celular?</p>
+    <button onclick="window.installApp()" style="background:white; color:black; border:none; padding:10px 20px; border-radius:10px; font-weight:800;">INSTALAR 🏡</button>
+    <button onclick="document.getElementById('install-banner').style.display='none'" style="background:none; color:white; border:none; margin-left:10px;">Después</button>
+</div>
 
 <div id="login-screen">
     <div class="login-box">
@@ -123,7 +123,27 @@
 
     const K = "07dd4f0a1180673510c5047ae8b5eec8"; 
 
-    // 1. LOGIN
+    // LÓGICA DE INSTALACIÓN AUTOMÁTICA
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        document.getElementById('install-banner').style.display = 'block';
+    });
+
+    window.installApp = async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') console.log('Instalada');
+            deferredPrompt = null;
+            document.getElementById('install-banner').style.display = 'none';
+        } else {
+            alert("Para instalar: Toca los 3 puntos (o compartir) y selecciona 'Agregar a pantalla de inicio'");
+        }
+    };
+
+    // LOGIN
     window.onload = () => {
         const a = localStorage.getItem('fa_key');
         if(a === "familia2026" || a === "ticoadmin2026") {
@@ -142,7 +162,7 @@
     
     window.salir = () => { localStorage.clear(); location.reload(); };
 
-    // 2. SUBIR FOTOS (Motor Directo)
+    // SUBIR FOTOS
     document.getElementById('file').onchange = async (e) => {
         const files = e.target.files;
         if(files.length === 0) return;
@@ -160,7 +180,6 @@
         try {
             let urls = [];
             for(let file of files) {
-                st.innerText = "Cargando...";
                 const fd = new FormData(); fd.append("image", file);
                 const req = await fetch(`https://api.imgbb.com/1/upload?key=${K}`, {method:"POST", body:fd});
                 const res = await req.json();
@@ -177,7 +196,7 @@
         } catch(err) { alert("Error"); btn.disabled=false; }
     };
 
-    // 3. MURO
+    // MURO
     let fNow = "Todo";
     let cache = [];
 
@@ -205,13 +224,12 @@
         const list = cache.filter(p => fNow === "Todo" || p.categoria === fNow);
 
         list.forEach(p => {
-            const pics = p.fotos || (p.foto ? [p.foto] : []);
+            const pics = p.fotos || [p.foto];
             const likes = p.likesBy || [];
             const isLiked = likes.includes(me);
             const coms = p.comentarios || [];
 
             let galeria = `<img src="${pics[0]}" style="width:100%; border-radius:15px;">`;
-            
             if(pics.length > 1) {
                 galeria = `
                 <div class="c-wrap">
@@ -240,7 +258,7 @@
                 <div class="com-box">
                     ${coms.map(c=>`<div style="font-size:12px; margin-bottom:5px;"><b>${c.autor}:</b> ${c.texto}</div>`).join('')}
                     <div style="display:flex; gap:5px; margin-top:5px;">
-                        <input id="in-${p.id}" class="com-input" placeholder="Escribe un comentario...">
+                        <input id="in-${p.id}" class="com-input" placeholder="Comentar...">
                         <button class="com-btn" onclick="window.cm('${p.id}')">OK</button>
                     </div>
                 </div>
@@ -248,7 +266,7 @@
         });
     }
 
-    // 4. FUNCIONES GLOBALES
+    // FUNCIONES GLOBALES
     window.dots = (id) => {
         const el = document.getElementById('t-'+id);
         const i = Math.round(el.scrollLeft / el.offsetWidth);
