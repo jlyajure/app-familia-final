@@ -19,6 +19,13 @@
         :root { --blue: #3b82f6; --bg: #0f172a; --red: #ff0000; --gray: #64748b; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: var(--bg); color: white; overflow-x: hidden; }
         
+        /* BANNER DE INSTALACIÓN */
+        #install-banner { 
+            display: none; background: var(--blue); padding: 15px; text-align: center; 
+            position: fixed; bottom: 0; width: 100%; z-index: 10000; border-radius: 20px 20px 0 0;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
+        }
+
         #zoom-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 20000; align-items: center; justify-content: center; padding: 20px; }
         #zoom-modal img { max-width: 100%; max-height: 90vh; border-radius: 10px; }
         #zoom-modal .close { position: absolute; top: 20px; right: 20px; color: white; font-size: 40px; cursor: pointer; }
@@ -63,6 +70,12 @@
 </head>
 <body>
 
+<div id="install-banner">
+    <p style="margin:0 0 10px 0; font-weight:800;">¿Quieres instalar la App en tu celular?</p>
+    <button onclick="window.installApp()" style="background:white; color:black; border:none; padding:10px 20px; border-radius:10px; font-weight:800;">INSTALAR 🏡</button>
+    <button onclick="document.getElementById('install-banner').style.display='none'" style="background:none; color:white; border:none; margin-left:10px;">Después</button>
+</div>
+
 <div id="zoom-modal" onclick="this.style.display='none'">
     <span class="close">&times;</span>
     <img id="zoom-img" src="">
@@ -101,7 +114,6 @@
             <button onclick="document.getElementById('file').click()" id="btnUp" style="width:100%; background:var(--blue); color:white; border:none; padding:15px; border-radius:15px; font-weight:800;">📸 SUBIR RECUERDO</button>
         </div>
         <input type="file" id="file" style="display:none;" accept="image/*" multiple>
-
         <div id="muro"></div>
     </div>
 </div>
@@ -111,6 +123,25 @@
     import { collection, addDoc, query, orderBy, onSnapshot, updateDoc, doc, arrayUnion, arrayRemove, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const K = "07dd4f0a1180673510c5047ae8b5eec8"; 
+
+    // LÓGICA DE INSTALACIÓN
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        document.getElementById('install-banner').style.display = 'block';
+    });
+
+    window.installApp = async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            deferredPrompt = null;
+            document.getElementById('install-banner').style.display = 'none';
+        } else {
+            alert("Para instalar: Toca los 3 puntos (o compartir) y selecciona 'Agregar a pantalla de inicio'");
+        }
+    };
 
     window.zoom = (src) => { document.getElementById('zoom-img').src = src; document.getElementById('zoom-modal').style.display = 'flex'; };
     
@@ -149,7 +180,6 @@
         const txt = prompt("Mensaje de la foto:");
         const btn = document.getElementById('btnUp');
         btn.disabled = true; btn.innerText = "⏳ CARGANDO...";
-        
         try {
             let urls = [];
             for(let f of files) {
@@ -157,136 +187,46 @@
                 const res = await fetch(`https://api.imgbb.com/1/upload?key=${K}`, {method:"POST", body:fd}).then(r => r.json());
                 if(res.success) urls.push(res.data.url);
             }
-            await addDoc(collection(db, "mensajes"), {
-                texto: txt || "", fotos: urls, autor: u, categoria: cat, 
-                fecha: new Date(), likesBy: [], comentarios: []
-            });
+            await addDoc(collection(db, "mensajes"), { texto: txt || "", fotos: urls, autor: u, categoria: cat, fecha: new Date(), likesBy: [], comentarios: [] });
             btn.disabled = false; btn.innerText = "📸 SUBIR RECUERDO";
         } catch(err) { alert("Error"); btn.disabled = false; }
     };
 
     let fNow = "Todo";
     let cache = [];
-
-    window.filt = (c) => {
-        fNow = c;
-        document.querySelectorAll('.chip').forEach(b => b.classList.toggle('active', b.id === 'btn-'+c));
-        pintar();
-    };
-
-    onSnapshot(query(collection(db, "mensajes"), orderBy("fecha", "desc")), snap => {
-        cache = snap.docs.map(d => ({id:d.id, ...d.data()}));
-        pintar();
-    });
-
-    window.move = (id, d) => {
-        const el = document.getElementById('t-'+id);
-        el.scrollBy({left: d * el.offsetWidth, behavior: 'smooth'});
-    };
-
+    window.filt = (c) => { fNow = c; document.querySelectorAll('.chip').forEach(b => b.classList.toggle('active', b.id === 'btn-'+c)); pintar(); };
+    onSnapshot(query(collection(db, "mensajes"), orderBy("fecha", "desc")), snap => { cache = snap.docs.map(d => ({id:d.id, ...d.data()})); pintar(); });
+    window.move = (id, d) => { const el = document.getElementById('t-'+id); el.scrollBy({left: d * el.offsetWidth, behavior: 'smooth'}); };
+    
     function pintar() {
         const box = document.getElementById('muro');
         box.innerHTML = "";
         const me = localStorage.getItem('u_name');
         const admin = localStorage.getItem('fa_key') === "ticoadmin2026";
         const list = cache.filter(p => fNow === "Todo" || p.categoria === fNow);
-
         list.forEach(p => {
             let pics = p.fotos || [];
             if(pics.length === 0 && p.foto) pics = [p.foto];
             const likes = p.likesBy || [];
             const isLiked = likes.includes(me);
             const coms = p.comentarios || [];
-
             let gal = `<div style="padding:20px; color:gray; text-align:center;">Cargando...</div>`;
             if(pics.length > 0) {
-                if(pics.length === 1) {
-                    gal = `<img src="${pics[0]}" onclick="window.zoom('${pics[0]}')" style="width:100%; border-radius:15px; cursor:zoom-in;">`;
-                } else {
-                    gal = `<div class="c-wrap">
-                        <button class="nav prev" onclick="window.move('${p.id}',-1)">❮</button>
-                        <div class="c-track" id="t-${p.id}" onscroll="window.dots('${p.id}')">
-                            ${pics.map(s => `<img src="${s}" onclick="window.zoom('${s}')">`).join('')}
-                        </div>
-                        <button class="nav next" onclick="window.move('${p.id}',1)">❯</button>
-                    </div>
-                    <div class="dots" id="d-${p.id}">${pics.map((_,i)=>`<div class="dot ${i===0?'active':''}"></div>`).join('')}</div>`;
-                }
+                if(pics.length === 1) gal = `<img src="${pics[0]}" onclick="window.zoom('${pics[0]}')" style="width:100%; border-radius:15px; cursor:zoom-in;">`;
+                else gal = `<div class="c-wrap"><button class="nav prev" onclick="window.move('${p.id}',-1)">❮</button><div class="c-track" id="t-${p.id}" onscroll="window.dots('${p.id}')">${pics.map(s => `<img src="${s}" onclick="window.zoom('${s}')">`).join('')}</div><button class="nav next" onclick="window.move('${p.id}',1)">❯</button></div><div class="dots" id="d-${p.id}">${pics.map((_,i)=>`<div class="dot ${i===0?'active':''}"></div>`).join('')}</div>`;
             }
-
-            box.innerHTML += `
-            <div class="card">
-                <div class="head">
-                    <span style="font-weight:800; color:var(--blue);">${p.autor} <small>(${p.categoria})</small></span>
-                    ${admin ? `<button class="btn-admin" onclick="window.menuAdmin('${p.id}')">⚙️</button>` : ''}
-                </div>
-                <p style="margin:10px 0;">${p.texto}</p>
-                ${gal}
-                <div style="margin-top:10px;">
-                    <button class="like ${isLiked?'yes':''}" onclick="window.lk('${p.id}')">
-                        <span>${isLiked?'❤️':'🤍'}</span> (${likes.length})
-                    </button>
-                    ${likes.length > 0 ? `<small class="like-names">A: ${likes.join(', ')}</small>` : ''}
-                </div>
-                <div class="com-box">
-                    ${coms.map(c => `
-                        <div class="com-item">
-                            <span><b>${c.autor || 'Alguien'}:</b> ${c.texto}</span>
-                            ${admin ? `<span class="com-del" onclick="window.delCom('${p.id}','${c.autor}','${c.texto}')">×</span>` : ''}
-                        </div>
-                    `).join('')}
-                    <div class="com-input-wrap">
-                        <input id="in-${p.id}" class="com-input" placeholder="Comentar...">
-                        <button class="com-btn" onclick="window.cm('${p.id}')">OK</button>
-                    </div>
-                </div>
-            </div>`;
+            box.innerHTML += `<div class="card"><div class="head"><span style="font-weight:800; color:var(--blue);">${p.autor} <small>(${p.categoria})</small></span>${admin ? `<button class="btn-admin" onclick="window.menuAdmin('${p.id}')">⚙️</button>` : ''}</div><p style="margin:10px 0;">${p.texto}</p>${gal}<div style="margin-top:10px;"><button class="like ${isLiked?'yes':''}" onclick="window.lk('${p.id}')"><span>${isLiked?'❤️':'🤍'}</span> (${likes.length})</button>${likes.length > 0 ? `<small class="like-names">A: ${likes.join(', ')}</small>` : ''}</div><div class="com-box">${coms.map(c => `<div class="com-item"><span><b>${c.autor || 'Alguien'}:</b> ${c.texto}</span>${admin ? `<span class="com-del" onclick="window.delCom('${p.id}','${c.autor}','${c.texto}')">×</span>` : ''}</div>`).join('')}<div class="com-input-wrap"><input id="in-${p.id}" class="com-input" placeholder="Comentar..."><button class="com-btn" onclick="window.cm('${p.id}')">OK</button></div></div></div>`;
         });
     }
-
     window.menuAdmin = async (id) => {
         const op = prompt("¿Qué desea hacer?\n1 - Editar texto\n2 - Borrar foto completa\n(Escriba 1 o 2)");
-        if (op === "1") {
-            const ref = doc(db, "mensajes", id);
-            const sn = await getDoc(ref);
-            const nuevo = prompt("Editar mensaje:", sn.data().texto);
-            if(nuevo !== null) await updateDoc(ref, {texto: nuevo});
-        } else if (op === "2") {
-            if(confirm("¿Seguro que desea ELIMINAR este recuerdo?")) await deleteDoc(doc(db, "mensajes", id));
-        }
+        if (op === "1") { const ref = doc(db, "mensajes", id); const sn = await getDoc(ref); const nuevo = prompt("Editar mensaje:", sn.data().texto); if(nuevo !== null) await updateDoc(ref, {texto: nuevo}); }
+        else if (op === "2") { if(confirm("¿Seguro?")) await deleteDoc(doc(db, "mensajes", id)); }
     };
-
-    window.delCom = async (postId, cAutor, cTexto) => {
-        if(confirm(`¿Borrar el comentario de ${cAutor}?`)) {
-            const ref = doc(db, "mensajes", postId);
-            await updateDoc(ref, { comentarios: arrayRemove({autor: cAutor, texto: cTexto}) });
-        }
-    };
-
-    window.lk = async (id) => {
-        const u = getName();
-        const ref = doc(db, "mensajes", id);
-        const sn = await getDoc(ref);
-        const ls = sn.data().likesBy || [];
-        if(ls.includes(u)) await updateDoc(ref, {likesBy: arrayRemove(u)});
-        else await updateDoc(ref, {likesBy: arrayUnion(u)});
-    };
-
-    window.cm = async (id) => {
-        const tx = document.getElementById('in-'+id).value;
-        if(!tx) return;
-        const u = getName();
-        await updateDoc(doc(db, "mensajes", id), { comentarios: arrayUnion({autor: u, texto: tx}) });
-        document.getElementById('in-'+id).value = "";
-    };
-
-    window.dots = (id) => {
-        const el = document.getElementById('t-'+id);
-        const i = Math.round(el.scrollLeft / el.offsetWidth);
-        const ds = document.getElementById('d-'+id).children;
-        for(let d of ds) d.classList.remove('active');
-        if(ds[i]) ds[i].classList.add('active');
-    };
+    window.delCom = async (postId, cAutor, cTexto) => { if(confirm(`¿Borrar comentario?`)) { const ref = doc(db, "mensajes", postId); await updateDoc(ref, { comentarios: arrayRemove({autor: cAutor, texto: cTexto}) }); } };
+    window.lk = async (id) => { const u = getName(); const ref = doc(db, "mensajes", id); const sn = await getDoc(ref); const ls = sn.data().likesBy || []; if(ls.includes(u)) await updateDoc(ref, {likesBy: arrayRemove(u)}); else await updateDoc(ref, {likesBy: arrayUnion(u)}); };
+    window.cm = async (id) => { const tx = document.getElementById('in-'+id).value; if(!tx) return; const u = getName(); await updateDoc(doc(db, "mensajes", id), { comentarios: arrayUnion({autor: u, texto: tx}) }); document.getElementById('in-'+id).value = ""; };
+    window.dots = (id) => { const el = document.getElementById('t-'+id); const i = Math.round(el.scrollLeft / el.offsetWidth); const ds = document.getElementById('d-'+id).children; for(let d of ds) d.classList.remove('active'); if(ds[i]) ds[i].classList.add('active'); };
 </script>
 </body>
 </html>
