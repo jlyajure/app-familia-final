@@ -19,11 +19,10 @@
         :root { --blue: #3b82f6; --bg: #0f172a; --red: #ff0000; --gray: #64748b; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: var(--bg); color: white; overflow-x: hidden; }
         
-        /* BANNER DE INSTALACIÓN */
         #install-banner { 
-            display: none; background: var(--blue); padding: 15px; text-align: center; 
-            position: fixed; bottom: 0; width: 100%; z-index: 10000; border-radius: 20px 20px 0 0;
-            box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
+            display: none; background: var(--blue); padding: 20px; text-align: center; 
+            position: fixed; bottom: 0; width: 100%; z-index: 10000; border-radius: 25px 25px 0 0;
+            box-shadow: 0 -5px 30px rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.2);
         }
 
         #zoom-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 20000; align-items: center; justify-content: center; padding: 20px; }
@@ -71,9 +70,9 @@
 <body>
 
 <div id="install-banner">
-    <p style="margin:0 0 10px 0; font-weight:800;">¿Quieres instalar la App en tu celular?</p>
-    <button onclick="window.installApp()" style="background:white; color:black; border:none; padding:10px 20px; border-radius:10px; font-weight:800;">INSTALAR 🏡</button>
-    <button onclick="document.getElementById('install-banner').style.display='none'" style="background:none; color:white; border:none; margin-left:10px;">Después</button>
+    <p style="margin:0 0 15px 0; font-weight:800; font-size: 18px;">¡Instala la App de la Familia! 🏡</p>
+    <button onclick="window.installApp()" style="background:white; color:black; border:none; padding:12px 25px; border-radius:12px; font-weight:800; font-size: 16px; width: 100%;">INSTALAR AHORA</button>
+    <button onclick="document.getElementById('install-banner').style.display='none'" style="background:none; color:white; border:none; margin-top:15px; font-size: 14px; opacity: 0.8;">Quizás más tarde</button>
 </div>
 
 <div id="zoom-modal" onclick="this.style.display='none'">
@@ -124,12 +123,21 @@
 
     const K = "07dd4f0a1180673510c5047ae8b5eec8"; 
 
-    // LÓGICA DE INSTALACIÓN
+    // REGISTRO DEL SERVICE WORKER (EL VIGILANTE)
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js').then(() => console.log("Vigilante activo"));
+    }
+
+    // LÓGICA DE INSTALACIÓN MEJORADA
     let deferredPrompt;
     window.addEventListener('beforeinstallprompt', (e) => {
+        console.log('Evento de instalacion capturado');
         e.preventDefault();
         deferredPrompt = e;
-        document.getElementById('install-banner').style.display = 'block';
+        // Solo mostramos el banner si la app NO está ya instalada
+        if (!window.matchMedia('(display-mode: standalone)').matches) {
+            document.getElementById('install-banner').style.display = 'block';
+        }
     });
 
     window.installApp = async () => {
@@ -139,7 +147,7 @@
             deferredPrompt = null;
             document.getElementById('install-banner').style.display = 'none';
         } else {
-            alert("Para instalar: Toca los 3 puntos (o compartir) y selecciona 'Agregar a pantalla de inicio'");
+            alert("Para instalar:\n1. Toca los 3 puntos (o el botón compartir en iPhone)\n2. Selecciona 'Agregar a pantalla de inicio'");
         }
     };
 
