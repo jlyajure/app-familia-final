@@ -8,6 +8,11 @@
     <meta name="apple-mobile-web-app-title" content="Familia">
     <meta name="application-name" content="Familia">
     
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0f172a">
+    
     <link rel="icon" type="image/png" href="https://img.icons8.com/emoji/192/house-with-garden.png">
     <link rel="apple-touch-icon" href="https://img.icons8.com/emoji/192/house-with-garden.png">
     
@@ -500,7 +505,7 @@
         });
     }
 
-    // 🟢 FUNCIONES GLOBALES RESTAURADAS (LIKES, COMENTARIOS, BORRAR)
+    // 🟢 FUNCIONES GLOBALES
     window.darLike = async (id) => {
         const nombre = getNombre();
         if(!nombre) return;
