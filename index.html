@@ -2,239 +2,391 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>Familia</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#3b82f6">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Familia</title>
     <meta name="apple-mobile-web-app-title" content="Familia">
-    <link rel="apple-touch-icon" href="https://img.icons8.com/emoji/192/house-with-garden.png">
+    <meta name="application-name" content="Familia">
+    
     <link rel="icon" type="image/png" href="https://img.icons8.com/emoji/192/house-with-garden.png">
+    <link rel="apple-touch-icon" href="https://img.icons8.com/emoji/192/house-with-garden.png">
+    
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     
     <style>
         * { box-sizing: border-box; }
-        :root { --blue: #3b82f6; --bg: #0f172a; --red: #ff0000; --gray: #64748b; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: var(--bg); color: white; overflow-x: hidden; }
+        :root { --accent-blue: #3b82f6; --dark-bg: linear-gradient(180deg, #0f172a 0%, #1e293b 100%); --wa-green: #25d366; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; min-height: 100vh; background: var(--dark-bg); background-attachment: fixed; color: #f8fafc; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
         
-        #install-banner { 
-            display: none; background: var(--blue); padding: 20px; text-align: center; 
-            position: fixed; bottom: 0; width: 100%; z-index: 10000; border-radius: 25px 25px 0 0;
-            box-shadow: 0 -5px 30px rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.2);
-        }
-
-        #zoom-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 20000; align-items: center; justify-content: center; padding: 20px; }
-        #zoom-modal img { max-width: 100%; max-height: 90vh; border-radius: 10px; }
-        #zoom-modal .close { position: absolute; top: 20px; right: 20px; color: white; font-size: 40px; cursor: pointer; }
-
-        #login-screen { position: fixed; inset: 0; background: url('https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&q=80&w=2070') no-repeat center center/cover; display: flex; align-items: flex-start; justify-content: center; z-index: 9999; padding-top: 80px; }
-        .login-box { background: rgba(15, 23, 42, 0.95); padding: 40px; border-radius: 30px; text-align: center; width: 90%; max-width: 320px; border: 1px solid rgba(255,255,255,0.2); }
-        .login-input { width: 100%; padding: 15px; border-radius: 15px; border: 2px solid var(--blue); background: #1e293b; color: white; text-align: center; font-size: 18px; margin-top: 20px; outline: none; }
-
-        header { background: #1e293b; padding: 15px 20px; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
-        .btn-out { background: var(--red); color: white; border: none; padding: 8px 15px; border-radius: 10px; font-weight: 800; cursor: pointer; }
-
-        .container { max-width: 500px; margin: auto; padding: 15px; }
-        .btn-admin { background: #f59e0b; border: none; padding: 8px 12px; border-radius: 10px; font-size: 16px; cursor: pointer; color: white; }
-
-        .card { background: white; border-radius: 25px; padding: 20px; margin-bottom: 25px; color: #0f172a; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&q=80&w=2070') no-repeat center center/cover; display: flex; align-items: flex-start; justify-content: center; z-index: 1000; padding-top: 100px; }
+        #login-screen::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); }
+        .login-card { position: relative; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.15); padding: 40px 25px; border-radius: 35px; text-align: center; max-width: 320px; width: 90%; box-shadow: 0 30px 60px rgba(0,0,0,0.6); }
+        #passInput { width: 100%; padding: 18px; border: 2px solid rgba(255,255,255,0.2); border-radius: 20px; background: rgba(255,255,255,0.08); color: white; text-align: center; outline: none; margin-top: 20px; font-size: 16px; }
         
-        .c-wrap { position: relative; margin: 10px -20px; background: #000; overflow: hidden; min-height: 200px; display: flex; align-items: center; }
-        .c-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; width: 100%; }
-        .c-track img { width: 100%; flex-shrink: 0; scroll-snap-align: start; aspect-ratio: 1/1; object-fit: cover; cursor: zoom-in; }
+        #app-content { display: none; padding-bottom: 40px; }
+        header { background: rgba(15, 23, 42, 0.9); padding: 20px; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .container { max-width: 480px; margin: auto; padding: 20px 15px; }
+
+        .filter-scroll { overflow-x: auto; white-space: nowrap; padding-bottom: 10px; margin-bottom: 15px; }
+        .filter-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 8px 16px; border-radius: 20px; margin-right: 8px; font-size: 13px; cursor: pointer; transition: 0.3s; }
+        .filter-btn.active { background: var(--accent-blue); border-color: var(--accent-blue); font-weight: 800; }
+
+        .category-select { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 15px; background: rgba(255,255,255,0.9); border: none; font-size: 14px; color: #1e293b; }
         
-        .nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.8); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10; font-weight: bold; border: none; }
-        .prev { left: 10px; }
-        .next { right: 10px; }
-
-        .like { background: none; border: none; font-size: 16px; cursor: pointer; color: var(--gray); font-weight: 800; padding: 10px 0; display: flex; align-items: center; gap: 5px; }
-        .like.yes { color: var(--red) !important; }
-        .like-names { font-size: 11px; color: var(--gray); margin-top: -8px; margin-bottom: 10px; display: block; }
-
-        .com-box { background: #f1f5f9; padding: 10px; border-radius: 15px; margin-top: 10px; }
-        .com-item { font-size: 12px; margin-bottom: 8px; color: #334155; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
-        .com-del { color: var(--red); font-weight: 800; cursor: pointer; padding-left: 10px; font-size: 14px; }
+        .month-separator { background: rgba(59, 130, 246, 0.2); color: #93c5fd; padding: 8px 20px; border-radius: 50px; font-size: 12px; font-weight: 800; text-align: center; margin: 30px 0 15px 0; border: 1px solid rgba(59, 130, 246, 0.3); letter-spacing: 2px; text-transform: uppercase; }
         
-        .com-input-wrap { display: flex; gap: 5px; margin-top: 8px; }
-        .com-input { flex: 1; padding: 10px; border-radius: 10px; border: 1px solid #cbd5e1; outline: none; }
-        .com-btn { background: var(--blue); color: white; border: none; border-radius: 10px; padding: 0 15px; font-weight: 800; cursor: pointer; }
+        .btn-post { background: var(--accent-blue); color: white; padding: 16px; border-radius: 18px; font-weight: 700; cursor: pointer; display: block; text-align: center; margin-bottom: 10px; transition: transform 0.2s; }
+        
+        #status-msg { text-align: center; font-size: 12px; color: #94a3b8; margin-bottom: 20px; min-height: 15px; font-weight: bold; }
+        #wa-notice { display: none; background: var(--wa-green); color: white; padding: 15px; border-radius: 22px; text-align: center; font-weight: 800; text-decoration: none; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(37,211,102,0.3); }
 
-        .scroll { overflow-x: auto; white-space: nowrap; padding-bottom: 15px; display: flex; gap: 10px; }
-        .chip { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 20px; cursor: pointer; }
-        .chip.active { background: var(--blue); border-color: var(--blue); }
+        .post { background: white; border-radius: 28px; padding: 20px; margin-bottom: 25px; color: #1e293b; position: relative; box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
+        .post-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .post-author { font-weight: 800; color: var(--accent-blue); font-size: 14px; }
+        .category-badge { font-size: 10px; background: #e0f2fe; color: #0284c7; padding: 4px 8px; border-radius: 8px; font-weight: 700; margin-left: 8px; text-transform: uppercase; }
+        .post-date { font-size: 11px; color: #94a3b8; font-weight: 600; }
+        
+        .btn-delete-admin { background: #ff4757; color: white; border: none; padding: 6px 10px; border-radius: 10px; cursor: pointer; margin-left: 10px; }
+        
+        /* 🖼️ CARRUSEL DE FOTOS */
+        .post-carousel { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 10px; margin: 10px 0; padding-bottom: 5px; -webkit-overflow-scrolling: touch; }
+        .post-carousel::-webkit-scrollbar { height: 6px; }
+        .post-carousel::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+        .post-carousel::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .post-carousel img { scroll-snap-align: center; flex: 0 0 100%; width: 100%; border-radius: 20px; object-fit: cover; margin: 0; cursor: pointer; }
+        .swipe-indicator { font-size: 11px; color: #94a3b8; text-align: right; margin-top: -5px; margin-bottom: 10px; font-style: italic; }
+        
+        .btn-like { background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; padding: 8px 15px; border-radius: 12px; cursor: pointer; font-weight: 700; width: 100%; text-align: left; margin-bottom: 5px; transition: 0.3s; }
+        .btn-like.liked { background: #fff5f5; color: #ff4757; border-color: #ff4757; }
+        
+        .likes-list { font-size: 11px; color: #64748b; margin-bottom: 15px; margin-left: 5px; font-style: italic; }
+
+        .comments-section { background: #f8fafc; padding: 12px; border-radius: 18px; }
+        .comment { font-size: 13px; margin-bottom: 6px; border-bottom: 1px solid #edf2f7; padding-bottom: 4px; }
+        .comment-input-group { display: flex; gap: 8px; margin-top: 10px; }
+        .comment-input { flex: 1; border: 1px solid #e2e8f0; border-radius: 10px; padding: 8px; font-size: 13px; outline: none; }
+        .btn-send-comment { background: var(--accent-blue); color: white; border: none; padding: 8px 12px; border-radius: 10px; cursor: pointer; }
+
+        #photo-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 5000; overflow: auto; justify-content: center; align-items: center; }
+        #modal-img { max-width: 100%; max-height: 100%; object-fit: contain; cursor: zoom-in; transition: transform 0.2s; }
+        #close-modal-btn { position: fixed; top: 20px; right: 20px; color: white; font-size: 30px; cursor: pointer; z-index: 5001; background: rgba(0,0,0,0.5); width: 45px; height: 45px; text-align: center; line-height: 45px; border-radius: 50%; border: 2px solid white; }
+
+        /* 🟢 BOTÓN WHATSAPP FLOTANTE APP FAMILIA */
+        .btn-wa-familia { position: fixed; bottom: 85px; right: 20px; background: #25D366; color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 0 20px rgba(37,211,102,0.4); z-index: 5500; transition: 0.3s; }
+        .btn-wa-familia:hover { transform: scale(1.1); box-shadow: 0 0 30px rgba(37,211,102,0.8); }
+        .btn-wa-familia svg { width: 32px; height: 32px; fill: currentColor; }
     </style>
 </head>
 <body>
 
-<div id="install-banner">
-    <p style="margin:0 0 15px 0; font-weight:800; font-size: 18px;">¡Instala la App de la Familia! 🏡</p>
-    <button onclick="window.installApp()" style="background:white; color:black; border:none; padding:12px 25px; border-radius:12px; font-weight:800; font-size: 16px; width: 100%;">INSTALAR AHORA</button>
-    <button onclick="document.getElementById('install-banner').style.display='none'" style="background:none; color:white; border:none; margin-top:15px; font-size: 14px; opacity: 0.8;">Quizás más tarde</button>
-</div>
-
-<div id="zoom-modal" onclick="this.style.display='none'">
-    <span class="close">&times;</span>
-    <img id="zoom-img" src="">
-</div>
-
 <div id="login-screen">
-    <div class="login-box">
-        <div style="font-size: 50px;">🌅</div>
-        <h2 style="color:white; margin:10px 0;">Familia</h2>
-        <input type="password" id="passInput" class="login-input" placeholder="Clave de acceso">
+    <div class="login-card">
+        <div style="font-size: 45px; margin-bottom: 15px;">🌅</div>
+        <h2 style="color: white; margin: 0;">Bienvenido a Nuestros Recuerdos</h2>
+        <p style="color: #cbd5e1; margin-top: 5px;">Familia</p>
+        <input type="password" id="passInput" placeholder="Clave de acceso">
     </div>
 </div>
 
-<div id="app-content" style="display:none;">
+<div id="app-content">
     <header>
-        <span style="font-weight: 800;">Recuerdos 📸</span>
-        <button onclick="window.salir()" class="btn-out">Salir 🔒</button>
+        <h1 style="font-size: 18px; margin:0; color:white;">Familia</h1>
+        <button onclick="localStorage.removeItem('familia_auth'); location.reload();" style="background:rgba(255,255,255,0.1); color:#94a3b8; border:none; padding:10px; border-radius:10px; cursor:pointer;">Salir 🔒</button>
     </header>
-
     <div class="container">
-        <div class="scroll">
-            <button class="chip active" id="btn-Todo" onclick="window.filt('Todo')">Todo</button>
-            <button class="chip" id="btn-Familia" onclick="window.filt('Familia')">🏠 Familia</button>
-            <button class="chip" id="btn-Fiestas" onclick="window.filt('Fiestas')">🎉 Fiestas</button>
-            <button class="chip" id="btn-Viajes" onclick="window.filt('Viajes')">✈️ Viajes</button>
-            <button class="chip" id="btn-Recuerdos" onclick="window.filt('Recuerdos')">📜 Recuerdos</button>
+        <div class="filter-scroll">
+            <button class="filter-btn active" onclick="filtrar('Todo')">Todo</button>
+            <button class="filter-btn" onclick="filtrar('Familia')">🏠 Familia</button>
+            <button class="filter-btn" onclick="filtrar('Fiestas')">🎉 Fiestas</button>
+            <button class="filter-btn" onclick="filtrar('Viajes')">✈️ Viajes</button>
+            <button class="filter-btn" onclick="filtrar('Recuerdos')">📜 Recuerdos</button>
+            <button class="filter-btn" onclick="filtrar('Jodedera')">🤣 Jodedera</button>
         </div>
 
-        <div class="upload" style="text-align:center; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 20px; margin-bottom: 20px;">
-            <select id="cat" style="width:100%; padding:10px; border-radius:10px; margin-bottom:10px;">
-                <option value="Familia">🏠 Familia</option>
+        <a id="wa-notice" href="#" target="_blank">📢 ¡AVISAR POR WHATSAPP!</a>
+        
+        <label for="fotoInput" id="labelPost" class="btn-post">✨ SUBIR NUEVO RECUERDO</label>
+        
+        <div id="upload-options" style="display:none;">
+            <select id="categoriaInput" class="category-select">
+                <option value="Familia">🏠 ¿Qué tipo de foto es? (Familia)</option>
                 <option value="Fiestas">🎉 Fiestas</option>
                 <option value="Viajes">✈️ Viajes</option>
                 <option value="Recuerdos">📜 Recuerdos</option>
+                <option value="Jodedera">🤣 Jodedera</option>
             </select>
-            <button onclick="document.getElementById('file').click()" id="btnUp" style="width:100%; background:var(--blue); color:white; border:none; padding:15px; border-radius:15px; font-weight:800;">📸 SUBIR RECUERDO</button>
         </div>
-        <input type="file" id="file" style="display:none;" accept="image/*" multiple>
+
+        <div id="status-msg"></div>
+        <input type="file" id="fotoInput" style="display:none;" accept="image/*" multiple>
         <div id="muro"></div>
     </div>
 </div>
+
+<div id="photo-modal">
+    <div id="close-modal-btn" onclick="cerrarLupa()">✕</div>
+    <img id="modal-img" src="">
+</div>
+
+<a href="https://wa.me/584125852879" target="_blank" class="btn-wa-familia" title="Escríbenos al WhatsApp">
+    <svg viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 19.84C10.57 19.84 9.14 19.45 7.9 18.71L7.61 18.54L4.47 19.36L5.31 16.3L5.12 16C4.33 14.78 3.91 13.36 3.91 11.91C3.91 7.43 7.56 3.79 12.05 3.79C14.22 3.79 16.27 4.64 17.8 6.18C19.34 7.71 20.19 9.76 20.19 11.92C20.19 16.4 16.54 20.04 12.05 20.04M16.52 13.79C16.27 13.67 15.06 13.07 14.83 12.99C14.6 12.91 14.43 12.87 14.27 13.11C14.1 13.36 13.64 13.92 13.5 14.09C13.36 14.27 13.21 14.29 12.96 14.17C12.72 14.04 11.92 13.78 10.97 12.94C10.23 12.28 9.72 11.45 9.58 11.2C9.43 10.96 9.56 10.82 9.69 10.7C9.8 10.59 9.94 10.42 10.06 10.28C10.18 10.13 10.23 10.03 10.3 9.87C10.39 9.7 10.34 9.56 10.28 9.44C10.22 9.32 9.72 8.1 9.52 7.6C9.32 7.12 9.12 7.18 8.97 7.18C8.83 7.18 8.66 7.18 8.5 7.18C8.34 7.18 8.08 7.24 7.85 7.5C7.63 7.76 7 8.35 7 9.55C7 10.75 7.88 11.91 8 12.08C8.13 12.25 9.73 14.71 12.18 15.76C12.76 16.01 13.22 16.16 13.58 16.27C14.16 16.45 14.69 16.41 15.11 16.35C15.58 16.28 16.52 15.78 16.72 15.22C16.92 14.66 16.92 14.18 16.85 14.09C16.78 13.99 16.63 13.93 16.38 13.8L16.52 13.79Z"/></svg>
+</a>
 
 <script type="module">
     import { db } from "./firebase.js";
     import { collection, addDoc, query, orderBy, onSnapshot, updateDoc, doc, arrayUnion, arrayRemove, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    const K = "07dd4f0a1180673510c5047ae8b5eec8"; 
+    const CLAVE_NORMAL = "familia2026";
+    const CLAVE_ADMIN = "ticoadmin2026";
+    const IMGBB_KEY = "07dd4f0a1180673510c5047ae8b5eec8"; 
 
-    // REGISTRO DEL SERVICE WORKER (EL VIGILANTE)
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js').then(() => console.log("Vigilante activo"));
-    }
+    let todosLosPosts = [];
+    let filtroActual = 'Todo';
 
-    // LÓGICA DE INSTALACIÓN MEJORADA
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-        console.log('Evento de instalacion capturado');
-        e.preventDefault();
-        deferredPrompt = e;
-        // Solo mostramos el banner si la app NO está ya instalada
-        if (!window.matchMedia('(display-mode: standalone)').matches) {
-            document.getElementById('install-banner').style.display = 'block';
-        }
-    });
-
-    window.installApp = async () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            deferredPrompt = null;
-            document.getElementById('install-banner').style.display = 'none';
-        } else {
-            alert("Para instalar:\n1. Toca los 3 puntos (o el botón compartir en iPhone)\n2. Selecciona 'Agregar a pantalla de inicio'");
-        }
+    const getNombre = () => {
+        let n = localStorage.getItem('user_n');
+        if(!n) { n = prompt("👤 Antes de entrar, escribe tu nombre:"); if(n) localStorage.setItem('user_n', n); }
+        return n;
     };
 
-    window.zoom = (src) => { document.getElementById('zoom-img').src = src; document.getElementById('zoom-modal').style.display = 'flex'; };
-    
-    function getName() {
-        let n = localStorage.getItem('u_name');
-        if(!n || n === "null" || n.trim() === "") {
-            n = prompt("Escribe tu nombre para participar:");
-            if(n) localStorage.setItem('u_name', n);
-        }
-        return n || "Alguien";
+    if(localStorage.getItem('familia_auth')) {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('app-content').style.display = 'block';
+        getNombre();
     }
-
-    window.onload = () => {
-        const a = localStorage.getItem('fa_key');
-        if(a === "familia2026" || a === "ticoadmin2026") {
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('app-content').style.display = 'block';
-        }
-    };
 
     document.getElementById('passInput').oninput = (e) => {
-        const v = e.target.value.toLowerCase();
-        if(v === "familia2026" || v === "ticoadmin2026") {
-            localStorage.setItem('fa_key', v);
+        const val = e.target.value.toLowerCase();
+        if(val === CLAVE_NORMAL || val === CLAVE_ADMIN) {
+            localStorage.setItem('familia_auth', val);
             location.reload();
         }
     };
-    
-    window.salir = () => { localStorage.clear(); location.reload(); };
 
-    document.getElementById('file').onchange = async (e) => {
-        const files = e.target.files;
-        if(files.length === 0) return;
-        const u = getName();
-        const cat = document.getElementById('cat').value;
-        const txt = prompt("Mensaje de la foto:");
-        const btn = document.getElementById('btnUp');
-        btn.disabled = true; btn.innerText = "⏳ CARGANDO...";
-        try {
-            let urls = [];
-            for(let f of files) {
-                const fd = new FormData(); fd.append("image", f);
-                const res = await fetch(`https://api.imgbb.com/1/upload?key=${K}`, {method:"POST", body:fd}).then(r => r.json());
-                if(res.success) urls.push(res.data.url);
-            }
-            await addDoc(collection(db, "mensajes"), { texto: txt || "", fotos: urls, autor: u, categoria: cat, fecha: new Date(), likesBy: [], comentarios: [] });
-            btn.disabled = false; btn.innerText = "📸 SUBIR RECUERDO";
-        } catch(err) { alert("Error"); btn.disabled = false; }
+    window.abrirLupa = (url) => {
+        const modal = document.getElementById('photo-modal');
+        const img = document.getElementById('modal-img');
+        img.src = url;
+        modal.style.display = 'flex';
     };
 
-    let fNow = "Todo";
-    let cache = [];
-    window.filt = (c) => { fNow = c; document.querySelectorAll('.chip').forEach(b => b.classList.toggle('active', b.id === 'btn-'+c)); pintar(); };
-    onSnapshot(query(collection(db, "mensajes"), orderBy("fecha", "desc")), snap => { cache = snap.docs.map(d => ({id:d.id, ...d.data()})); pintar(); });
-    window.move = (id, d) => { const el = document.getElementById('t-'+id); el.scrollBy({left: d * el.offsetWidth, behavior: 'smooth'}); };
-    
-    function pintar() {
-        const box = document.getElementById('muro');
-        box.innerHTML = "";
-        const me = localStorage.getItem('u_name');
-        const admin = localStorage.getItem('fa_key') === "ticoadmin2026";
-        const list = cache.filter(p => fNow === "Todo" || p.categoria === fNow);
-        list.forEach(p => {
-            let pics = p.fotos || [];
-            if(pics.length === 0 && p.foto) pics = [p.foto];
-            const likes = p.likesBy || [];
-            const isLiked = likes.includes(me);
-            const coms = p.comentarios || [];
-            let gal = `<div style="padding:20px; color:gray; text-align:center;">Cargando...</div>`;
-            if(pics.length > 0) {
-                if(pics.length === 1) gal = `<img src="${pics[0]}" onclick="window.zoom('${pics[0]}')" style="width:100%; border-radius:15px; cursor:zoom-in;">`;
-                else gal = `<div class="c-wrap"><button class="nav prev" onclick="window.move('${p.id}',-1)">❮</button><div class="c-track" id="t-${p.id}" onscroll="window.dots('${p.id}')">${pics.map(s => `<img src="${s}" onclick="window.zoom('${s}')">`).join('')}</div><button class="nav next" onclick="window.move('${p.id}',1)">❯</button></div><div class="dots" id="d-${p.id}">${pics.map((_,i)=>`<div class="dot ${i===0?'active':''}"></div>`).join('')}</div>`;
+    window.cerrarLupa = () => {
+        document.getElementById('photo-modal').style.display = 'none';
+    };
+
+    document.getElementById('labelPost').onclick = (e) => {
+        const opts = document.getElementById('upload-options');
+        if(opts.style.display === 'none') {
+            e.preventDefault();
+            opts.style.display = 'block';
+            document.getElementById('labelPost').innerHTML = "📸 AHORA SÍ, TOCA AQUÍ";
+        }
+    };
+
+    document.getElementById('fotoInput').onchange = async (e) => {
+        const files = e.target.files;
+        if (!files || files.length === 0) return;
+        
+        if(files.length > 5) {
+            alert("⚠️ Por favor, selecciona un máximo de 5 fotos por publicación.");
+            return;
+        }
+
+        const nombre = getNombre();
+        if (!nombre) return;
+        
+        const cat = document.getElementById('categoriaInput').value;
+        const mensaje = prompt(`✍️ Mensaje para ${cat}:`);
+        
+        const label = document.getElementById('labelPost');
+        const status = document.getElementById('status-msg');
+        label.innerHTML = "⏳ PROCESANDO...";
+        
+        try {
+            let urlsSubidas = [];
+            
+            // LA MAGIA SECUENCIAL ESTÁ AQUÍ (Sube de a una para no colgar el celular)
+            for(let i = 0; i < files.length; i++) {
+                status.innerHTML = `🎨 Comprimiendo foto ${i+1} de ${files.length}...`;
+                const compressedFile = await compressImage(files[i]);
+                
+                status.innerHTML = `🚀 Subiendo foto ${i+1} de ${files.length}...`;
+                const formData = new FormData();
+                formData.append("image", compressedFile);
+                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: formData });
+                const imgData = await res.json();
+                
+                if (imgData.success) {
+                    urlsSubidas.push(imgData.data.url);
+                }
             }
-            box.innerHTML += `<div class="card"><div class="head"><span style="font-weight:800; color:var(--blue);">${p.autor} <small>(${p.categoria})</small></span>${admin ? `<button class="btn-admin" onclick="window.menuAdmin('${p.id}')">⚙️</button>` : ''}</div><p style="margin:10px 0;">${p.texto}</p>${gal}<div style="margin-top:10px;"><button class="like ${isLiked?'yes':''}" onclick="window.lk('${p.id}')"><span>${isLiked?'❤️':'🤍'}</span> (${likes.length})</button>${likes.length > 0 ? `<small class="like-names">A: ${likes.join(', ')}</small>` : ''}</div><div class="com-box">${coms.map(c => `<div class="com-item"><span><b>${c.autor || 'Alguien'}:</b> ${c.texto}</span>${admin ? `<span class="com-del" onclick="window.delCom('${p.id}','${c.autor}','${c.texto}')">×</span>` : ''}</div>`).join('')}<div class="com-input-wrap"><input id="in-${p.id}" class="com-input" placeholder="Comentar..."><button class="com-btn" onclick="window.cm('${p.id}')">OK</button></div></div></div>`;
+            
+            if (urlsSubidas.length > 0) {
+                status.innerHTML = "📝 Guardando recuerdo...";
+                await addDoc(collection(db, "mensajes"), {
+                    texto: mensaje || "", 
+                    fotos: urlsSubidas, 
+                    autor: nombre, 
+                    categoria: cat, 
+                    fecha: new Date(), 
+                    likesBy: [], 
+                    comentarios: []
+                });
+                label.innerHTML = "✨ SUBIR NUEVO RECUERDO";
+                status.innerHTML = "✅ ¡Listo!";
+                document.getElementById('upload-options').style.display = 'none';
+                document.getElementById('wa-notice').style.display = "block";
+                document.getElementById('wa-notice').href = `https://wa.me/?text=¡Nuevo+recuerdo+en+${cat}!`;
+                document.getElementById('fotoInput').value = ""; 
+            }
+        } catch (err) { 
+            alert("Error: " + err.message);
+            label.innerHTML = "✨ SUBIR NUEVO RECUERDO";
+        }
+    };
+
+    async function compressImage(file) {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const MAX = 1200;
+                    let w = img.width; let h = img.height;
+                    if (w > MAX) { h *= MAX / w; w = MAX; }
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.8);
+                };
+            };
         });
     }
-    window.menuAdmin = async (id) => {
-        const op = prompt("¿Qué desea hacer?\n1 - Editar texto\n2 - Borrar foto completa\n(Escriba 1 o 2)");
-        if (op === "1") { const ref = doc(db, "mensajes", id); const sn = await getDoc(ref); const nuevo = prompt("Editar mensaje:", sn.data().texto); if(nuevo !== null) await updateDoc(ref, {texto: nuevo}); }
-        else if (op === "2") { if(confirm("¿Seguro?")) await deleteDoc(doc(db, "mensajes", id)); }
+
+    window.filtrar = (cat) => {
+        filtroActual = cat;
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if(btn.innerText.includes(cat) || (cat === 'Todo' && btn.innerText === 'Todo')) btn.classList.add('active');
+        });
+        pintarMuro();
     };
-    window.delCom = async (postId, cAutor, cTexto) => { if(confirm(`¿Borrar comentario?`)) { const ref = doc(db, "mensajes", postId); await updateDoc(ref, { comentarios: arrayRemove({autor: cAutor, texto: cTexto}) }); } };
-    window.lk = async (id) => { const u = getName(); const ref = doc(db, "mensajes", id); const sn = await getDoc(ref); const ls = sn.data().likesBy || []; if(ls.includes(u)) await updateDoc(ref, {likesBy: arrayRemove(u)}); else await updateDoc(ref, {likesBy: arrayUnion(u)}); };
-    window.cm = async (id) => { const tx = document.getElementById('in-'+id).value; if(!tx) return; const u = getName(); await updateDoc(doc(db, "mensajes", id), { comentarios: arrayUnion({autor: u, texto: tx}) }); document.getElementById('in-'+id).value = ""; };
-    window.dots = (id) => { const el = document.getElementById('t-'+id); const i = Math.round(el.scrollLeft / el.offsetWidth); const ds = document.getElementById('d-'+id).children; for(let d of ds) d.classList.remove('active'); if(ds[i]) ds[i].classList.add('active'); };
+
+    const q = query(collection(db, "mensajes"), orderBy("fecha", "desc"));
+    onSnapshot(q, (snapshot) => {
+        todosLosPosts = [];
+        snapshot.forEach((doc) => {
+            todosLosPosts.push({ id: doc.id, ...doc.data() });
+        });
+        pintarMuro();
+    });
+
+    function pintarMuro() {
+        const muro = document.getElementById('muro');
+        muro.innerHTML = "";
+        const esAdmin = localStorage.getItem('familia_auth') === "ticoadmin2026";
+        const miNombre = localStorage.getItem('user_n'); 
+        let ultimoMes = "";
+
+        const postsAmostrar = todosLosPosts.filter(p => filtroActual === 'Todo' || p.categoria === filtroActual);
+
+        if(postsAmostrar.length === 0) {
+            muro.innerHTML = `<div style="text-align:center; padding:30px; color:#94a3b8; font-size:14px;">Nada en "${filtroActual}"... ¡Sube la primera foto! 📸</div>`;
+            return;
+        }
+
+        postsAmostrar.forEach((data) => {
+            const fechaObj = data.fecha ? data.fecha.toDate() : new Date();
+            const mesActual = fechaObj.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+            const fechaCorta = fechaObj.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+            const catLabel = data.categoria || "Familia"; 
+            
+            const listaLikes = data.likesBy || [];
+            const nombresLikes = listaLikes.length > 0 ? `Le gusta a: <b>${listaLikes.join(", ")}</b>` : "";
+            const yaDiLike = listaLikes.includes(miNombre); 
+            const claseLike = yaDiLike ? "btn-like liked" : "btn-like"; 
+            const totalVisual = listaLikes.length + (data.likes || 0);
+            const textoLike = yaDiLike ? `❤️ Te gusta (${totalVisual})` : `🤍 Me gusta (${totalVisual})`;
+
+            if (mesActual !== ultimoMes) {
+                muro.innerHTML += `<div class="month-separator">${mesActual}</div>`;
+                ultimoMes = mesActual;
+            }
+
+            let imagenesArray = data.fotos || []; 
+            if(imagenesArray.length === 0 && data.foto) {
+                imagenesArray = [data.foto]; 
+            }
+
+            let carouselHtml = `<div class="post-carousel">`;
+            imagenesArray.forEach(url => {
+                carouselHtml += `<img src="${url}" onclick="window.abrirLupa('${url}')">`;
+            });
+            carouselHtml += `</div>`;
+
+            let swipeIndicator = imagenesArray.length > 1 ? `<div class="swipe-indicator">👉 Desliza para ver más (${imagenesArray.length} fotos)</div>` : "";
+
+            let comentariosHtml = data.comentarios ? data.comentarios.map(c => `<div class="comment"><b>${c.autor}:</b> ${c.texto}</div>`).join('') : "";
+
+            muro.innerHTML += `
+                <div class="post">
+                    <div class="post-header">
+                        <span class="post-author">👤 ${data.autor} <span class="category-badge">${catLabel}</span></span>
+                        <div>
+                            <span class="post-date">${fechaCorta}</span>
+                            ${esAdmin ? `<button class="btn-delete-admin" onclick="window.borrarPost('${data.id}')">🗑️</button>` : ""}
+                        </div>
+                    </div>
+                    <p>${data.texto}</p>
+                    
+                    ${carouselHtml}
+                    ${swipeIndicator}
+                    
+                    <button class="${claseLike}" onclick="darLike('${data.id}')">${textoLike}</button>
+                    <div class="likes-list">${nombresLikes}</div>
+                    
+                    <div class="comments-section">${comentariosHtml}
+                        <div class="comment-input-group">
+                            <input type="text" id="input-${data.id}" class="comment-input" placeholder="Opinar...">
+                            <button class="btn-send-comment" onclick="enviarComentario('${data.id}')">Publicar</button>
+                        </div>
+                    </div>
+                </div>`;
+        });
+    }
+
+    window.darLike = async (id) => {
+        const nombre = getNombre();
+        if(!nombre) return;
+
+        const docRef = doc(db, "mensajes", id);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            const lista = data.likesBy || [];
+
+            if (lista.includes(nombre)) {
+                await updateDoc(docRef, { likesBy: arrayRemove(nombre) });
+            } else {
+                await updateDoc(docRef, { likesBy: arrayUnion(nombre) });
+            }
+        }
+    };
+
+    window.enviarComentario = async (id) => {
+        const input = document.getElementById(`input-${id}`);
+        const nombre = getNombre();
+        if (!input.value || !nombre) return;
+        await updateDoc(doc(db, "mensajes", id), { comentarios: arrayUnion({ autor: nombre, texto: input.value }) });
+        input.value = "";
+    };
+    window.borrarPost = async (id) => {
+        if(confirm("¿Borrar este recuerdo?")) await deleteDoc(doc(db, "mensajes", id));
+    };
 </script>
+
 </body>
 </html>
