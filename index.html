@@ -22,16 +22,43 @@
         #login-screen::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); }
         .login-card { position: relative; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.15); padding: 40px 25px; border-radius: 35px; text-align: center; max-width: 320px; width: 90%; box-shadow: 0 30px 60px rgba(0,0,0,0.6); }
         #passInput { width: 100%; padding: 18px; border: 2px solid rgba(255,255,255,0.2); border-radius: 20px; background: rgba(255,255,255,0.08); color: white; text-align: center; outline: none; margin-top: 20px; font-size: 16px; }
+        #btnEntrar { width: 100%; padding: 16px; background: var(--wa-green); color: white; border: none; border-radius: 20px; margin-top: 15px; font-weight: 800; font-size: 16px; cursor: pointer; box-shadow: 0 4px 15px rgba(37,211,102,0.3); transition: 0.2s; }
+        #btnEntrar:active { transform: scale(0.95); }
         
         #app-content { display: none; padding-bottom: 40px; }
         header { background: rgba(15, 23, 42, 0.9); padding: 20px; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .container { max-width: 480px; margin: auto; padding: 20px 15px; }
 
-        .filter-scroll { overflow-x: auto; white-space: nowrap; padding-bottom: 10px; margin-bottom: 15px; }
+        /* 🟢 HISTORIAS */
+        #historias-container { display: none; margin-bottom: 20px; }
+        .historias-title { font-size: 13px; font-weight: 800; color: #94a3b8; margin-bottom: 10px; margin-left: 5px; }
+        .historias-scroll { display: flex; overflow-x: auto; gap: 15px; padding-bottom: 10px; -webkit-overflow-scrolling: touch; }
+        .historias-scroll::-webkit-scrollbar { display: none; }
+        .story-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; width: 65px; flex-shrink: 0; }
+        .story-ring { width: 65px; height: 65px; border-radius: 50%; padding: 3px; display: flex; align-items: center; justify-content: center; margin-bottom: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: 0.3s; }
+        .story-ring.unseen { background: #25d366; border: 2px solid #25d366; } 
+        .story-ring.seen { background: #64748b; border: 2px solid #64748b; opacity: 0.8; } 
+        .story-ring img { width: 100%; height: 100%; border-radius: 50%; border: 2px solid #0f172a; object-fit: cover; }
+        .story-author { font-size: 11px; color: #e2e8f0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-align: center; font-weight: 600; }
+
+        /* 🟢 VISOR DE HISTORIAS */
+        #story-viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 6000; flex-direction: column; }
+        .story-progress-container { position: absolute; top: 10px; left: 10px; right: 10px; height: 3px; background: rgba(255,255,255,0.3); border-radius: 3px; z-index: 6002; overflow: hidden; }
+        .story-progress-fill { height: 100%; background: white; width: 0%; border-radius: 3px; }
+        .story-header { position: absolute; top: 15px; left: 0; width: 100%; padding: 20px; display: flex; justify-content: space-between; align-items: center; z-index: 6001; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); }
+        .story-header-info { display: flex; align-items: center; gap: 10px; color: white; font-weight: 800; font-size: 15px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+        .story-close { color: white; font-size: 30px; cursor: pointer; text-shadow: 0 2px 4px rgba(0,0,0,0.8); padding: 0 10px; }
+        .story-img-container { flex: 1; display: flex; align-items: center; justify-content: center; height: 100%; }
+        .story-img-container img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .story-text { position: absolute; bottom: 40px; width: 100%; text-align: center; color: white; font-size: 16px; font-weight: 600; text-shadow: 0 2px 8px rgba(0,0,0,1); padding: 0 20px; }
+
+        /* 🟢 MURO Y FILTROS */
+        .filter-scroll { overflow-x: auto; white-space: nowrap; padding-bottom: 10px; margin-bottom: 15px; -webkit-overflow-scrolling: touch; }
+        .filter-scroll::-webkit-scrollbar { display: none; }
         .filter-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 8px 16px; border-radius: 20px; margin-right: 8px; font-size: 13px; cursor: pointer; transition: 0.3s; }
         .filter-btn.active { background: var(--accent-blue); border-color: var(--accent-blue); font-weight: 800; }
 
-        .category-select { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 15px; background: rgba(255,255,255,0.9); border: none; font-size: 14px; color: #1e293b; }
+        .category-select { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 15px; background: rgba(255,255,255,0.9); border: none; font-size: 14px; color: #1e293b; font-weight: bold; }
         
         .month-separator { background: rgba(59, 130, 246, 0.2); color: #93c5fd; padding: 8px 20px; border-radius: 50px; font-size: 12px; font-weight: 800; text-align: center; margin: 30px 0 15px 0; border: 1px solid rgba(59, 130, 246, 0.3); letter-spacing: 2px; text-transform: uppercase; }
         
@@ -48,17 +75,15 @@
         
         .btn-delete-admin { background: #ff4757; color: white; border: none; padding: 6px 10px; border-radius: 10px; cursor: pointer; margin-left: 10px; }
         
-        /* 🖼️ CARRUSEL DE FOTOS */
         .post-carousel { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 10px; margin: 10px 0; padding-bottom: 5px; -webkit-overflow-scrolling: touch; }
         .post-carousel::-webkit-scrollbar { height: 6px; }
         .post-carousel::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
         .post-carousel::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .post-carousel img { scroll-snap-align: center; flex: 0 0 100%; width: 100%; border-radius: 20px; object-fit: cover; margin: 0; cursor: pointer; }
+        .post-carousel img { scroll-snap-align: center; flex: 0 0 100%; width: 100%; border-radius: 20px; object-fit: cover; cursor: pointer; }
         .swipe-indicator { font-size: 11px; color: #94a3b8; text-align: right; margin-top: -5px; margin-bottom: 10px; font-style: italic; }
         
         .btn-like { background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; padding: 8px 15px; border-radius: 12px; cursor: pointer; font-weight: 700; width: 100%; text-align: left; margin-bottom: 5px; transition: 0.3s; }
         .btn-like.liked { background: #fff5f5; color: #ff4757; border-color: #ff4757; }
-        
         .likes-list { font-size: 11px; color: #64748b; margin-bottom: 15px; margin-left: 5px; font-style: italic; }
 
         .comments-section { background: #f8fafc; padding: 12px; border-radius: 18px; }
@@ -71,7 +96,7 @@
         #modal-img { max-width: 100%; max-height: 100%; object-fit: contain; cursor: zoom-in; transition: transform 0.2s; }
         #close-modal-btn { position: fixed; top: 20px; right: 20px; color: white; font-size: 30px; cursor: pointer; z-index: 5001; background: rgba(0,0,0,0.5); width: 45px; height: 45px; text-align: center; line-height: 45px; border-radius: 50%; border: 2px solid white; }
 
-        /* 🟢 BOTÓN WHATSAPP FLOTANTE APP FAMILIA */
+        /* 🟢 BOTÓN WHATSAPP */
         .btn-wa-familia { position: fixed; bottom: 85px; right: 20px; background: #25D366; color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 0 20px rgba(37,211,102,0.4); z-index: 5500; transition: 0.3s; }
         .btn-wa-familia:hover { transform: scale(1.1); box-shadow: 0 0 30px rgba(37,211,102,0.8); }
         .btn-wa-familia svg { width: 32px; height: 32px; fill: currentColor; }
@@ -82,9 +107,9 @@
 <div id="login-screen">
     <div class="login-card">
         <div style="font-size: 45px; margin-bottom: 15px;">🌅</div>
-        <h2 style="color: white; margin: 0;">Bienvenido a Nuestros Recuerdos</h2>
-        <p style="color: #cbd5e1; margin-top: 5px;">Familia</p>
+        <h2 style="color: white; margin: 0;">Nuestros Recuerdos</h2>
         <input type="password" id="passInput" placeholder="Clave de acceso">
+        <button id="btnEntrar">ENTRAR</button>
     </div>
 </div>
 
@@ -94,33 +119,59 @@
         <button onclick="localStorage.removeItem('familia_auth'); location.reload();" style="background:rgba(255,255,255,0.1); color:#94a3b8; border:none; padding:10px; border-radius:10px; cursor:pointer;">Salir 🔒</button>
     </header>
     <div class="container">
+        
+        <div id="historias-container">
+            <div class="historias-title">Estados Recientes (24h)</div>
+            <div id="historias-scroll" class="historias-scroll"></div>
+        </div>
+
         <div class="filter-scroll">
             <button class="filter-btn active" onclick="filtrar('Todo')">Todo</button>
             <button class="filter-btn" onclick="filtrar('Familia')">🏠 Familia</button>
             <button class="filter-btn" onclick="filtrar('Fiestas')">🎉 Fiestas</button>
+            <button class="filter-btn" onclick="filtrar('Celebración')">🍾 Celebración</button>
             <button class="filter-btn" onclick="filtrar('Viajes')">✈️ Viajes</button>
             <button class="filter-btn" onclick="filtrar('Recuerdos')">📜 Recuerdos</button>
             <button class="filter-btn" onclick="filtrar('Jodedera')">🤣 Jodedera</button>
         </div>
 
         <a id="wa-notice" href="#" target="_blank">📢 ¡AVISAR POR WHATSAPP!</a>
-        
-        <label for="fotoInput" id="labelPost" class="btn-post">✨ SUBIR NUEVO RECUERDO</label>
+
+        <label for="fotoInput" id="labelPost" class="btn-post">✨ SUBIR FOTO O HISTORIA</label>
         
         <div id="upload-options" style="display:none;">
             <select id="categoriaInput" class="category-select">
-                <option value="Familia">🏠 ¿Qué tipo de foto es? (Familia)</option>
-                <option value="Fiestas">🎉 Fiestas</option>
-                <option value="Viajes">✈️ Viajes</option>
-                <option value="Recuerdos">📜 Recuerdos</option>
-                <option value="Jodedera">🤣 Jodedera</option>
+                <option value="Familia">🏠 Publicación Normal (Familia)</option>
+                <option value="Fiestas">🎉 Publicación Normal (Fiestas)</option>
+                <option value="Celebración">🍾 Publicación Normal (Celebración)</option>
+                <option value="Viajes">✈️ Publicación Normal (Viajes)</option>
+                <option value="Recuerdos">📜 Publicación Normal (Recuerdos)</option>
+                <option value="Jodedera">🤣 Publicación Normal (Jodedera)</option>
+                <option value="Historia">⏳ HISTORIA (Desaparece en 24h)</option>
             </select>
         </div>
 
         <div id="status-msg"></div>
         <input type="file" id="fotoInput" style="display:none;" accept="image/*" multiple>
+        
         <div id="muro"></div>
     </div>
+</div>
+
+<div id="story-viewer">
+    <div class="story-progress-container">
+        <div id="sv-progress" class="story-progress-fill"></div>
+    </div>
+    <div class="story-header">
+        <div class="story-header-info">
+            <span id="sv-author">Autor</span>
+        </div>
+        <div class="story-close" onclick="cerrarHistoria()">✕</div>
+    </div>
+    <div class="story-img-container">
+        <img id="sv-img" src="">
+    </div>
+    <div id="sv-text" class="story-text"></div>
 </div>
 
 <div id="photo-modal">
@@ -133,19 +184,26 @@
 </a>
 
 <script type="module">
-    import { db } from "./firebase.js";
-    import { collection, addDoc, query, orderBy, onSnapshot, updateDoc, doc, arrayUnion, arrayRemove, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, updateDoc, arrayUnion, arrayRemove, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyBwBq4gLgv4DSfUidzUuC7Irmvj_4pCTtI", authDomain: "familia-yajure-app.firebaseapp.com", projectId: "familia-yajure-app", storageBucket: "familia-yajure-app.firebasestorage.app", messagingSenderId: "692035727386", appId: "1:692035727386:web:dfa3e39a481d56368a61a3" };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
     const CLAVE_NORMAL = "familia2026";
     const CLAVE_ADMIN = "ticoadmin2026";
     const IMGBB_KEY = "07dd4f0a1180673510c5047ae8b5eec8"; 
 
     let todosLosPosts = [];
+    let historiasActivas = [];
     let filtroActual = 'Todo';
+    let timerCierreHistoria; 
+    let historiasVistas = JSON.parse(localStorage.getItem('historias_vistas')) || [];
 
     const getNombre = () => {
         let n = localStorage.getItem('user_n');
-        if(!n) { n = prompt("👤 Antes de entrar, escribe tu nombre:"); if(n) localStorage.setItem('user_n', n); }
+        if(!n) { n = prompt("👤 Escribe tu nombre:"); if(n) localStorage.setItem('user_n', n); }
         return n;
     };
 
@@ -155,12 +213,22 @@
         getNombre();
     }
 
-    document.getElementById('passInput').oninput = (e) => {
-        const val = e.target.value.toLowerCase();
+    const intentarIngreso = () => {
+        const val = document.getElementById('passInput').value.trim().toLowerCase(); 
         if(val === CLAVE_NORMAL || val === CLAVE_ADMIN) {
             localStorage.setItem('familia_auth', val);
-            location.reload();
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('app-content').style.display = 'block';
+            getNombre();
+        } else {
+            alert("Clave incorrecta 🛑 (Revisa que no tengas un espacio en blanco al final)");
         }
+    };
+
+    document.getElementById('btnEntrar').onclick = intentarIngreso;
+    document.getElementById('passInput').oninput = (e) => {
+        const val = e.target.value.trim().toLowerCase();
+        if(val === CLAVE_NORMAL || val === CLAVE_ADMIN) intentarIngreso();
     };
 
     window.abrirLupa = (url) => {
@@ -186,11 +254,7 @@
     document.getElementById('fotoInput').onchange = async (e) => {
         const files = e.target.files;
         if (!files || files.length === 0) return;
-        
-        if(files.length > 5) {
-            alert("⚠️ Por favor, selecciona un máximo de 5 fotos por publicación.");
-            return;
-        }
+        if(files.length > 5) { alert("Máximo 5 fotos por publicación."); return; }
 
         const nombre = getNombre();
         if (!nombre) return;
@@ -204,21 +268,15 @@
         
         try {
             let urlsSubidas = [];
-            
-            // LA MAGIA SECUENCIAL ESTÁ AQUÍ (Sube de a una para no colgar el celular)
             for(let i = 0; i < files.length; i++) {
                 status.innerHTML = `🎨 Comprimiendo foto ${i+1} de ${files.length}...`;
                 const compressedFile = await compressImage(files[i]);
-                
-                status.innerHTML = `🚀 Subiendo foto ${i+1} de ${files.length}...`;
+                status.innerHTML = `🚀 Subiendo foto ${i+1}...`;
                 const formData = new FormData();
                 formData.append("image", compressedFile);
                 const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: formData });
                 const imgData = await res.json();
-                
-                if (imgData.success) {
-                    urlsSubidas.push(imgData.data.url);
-                }
+                if (imgData.success) urlsSubidas.push(imgData.data.url);
             }
             
             if (urlsSubidas.length > 0) {
@@ -228,20 +286,24 @@
                     fotos: urlsSubidas, 
                     autor: nombre, 
                     categoria: cat, 
-                    fecha: new Date(), 
-                    likesBy: [], 
+                    fecha: new Date(),
+                    likesBy: [],
                     comentarios: []
                 });
-                label.innerHTML = "✨ SUBIR NUEVO RECUERDO";
+                label.innerHTML = "✨ SUBIR FOTO O HISTORIA";
                 status.innerHTML = "✅ ¡Listo!";
                 document.getElementById('upload-options').style.display = 'none';
-                document.getElementById('wa-notice').style.display = "block";
-                document.getElementById('wa-notice').href = `https://wa.me/?text=¡Nuevo+recuerdo+en+${cat}!`;
+                
+                if (cat !== "Historia") {
+                    document.getElementById('wa-notice').style.display = "block";
+                    document.getElementById('wa-notice').href = `https://wa.me/?text=¡Nuevo+recuerdo+en+${cat}!`;
+                }
+                
                 document.getElementById('fotoInput').value = ""; 
             }
         } catch (err) { 
             alert("Error: " + err.message);
-            label.innerHTML = "✨ SUBIR NUEVO RECUERDO";
+            label.innerHTML = "✨ SUBIR FOTO O HISTORIA";
         }
     };
 
@@ -254,9 +316,8 @@
                 img.src = event.target.result;
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    const MAX = 1200;
                     let w = img.width; let h = img.height;
-                    if (w > MAX) { h *= MAX / w; w = MAX; }
+                    if (w > 1200) { h *= 1200 / w; w = 1200; }
                     canvas.width = w; canvas.height = h;
                     canvas.getContext('2d').drawImage(img, 0, 0, w, h);
                     canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.8);
@@ -264,6 +325,103 @@
             };
         });
     }
+
+    const q = query(collection(db, "mensajes"), orderBy("fecha", "desc"));
+    onSnapshot(q, (snapshot) => {
+        todosLosPosts = [];
+        historiasActivas = [];
+        
+        const ahora = new Date().getTime();
+        const limite24h = ahora - (24 * 60 * 60 * 1000);
+
+        snapshot.forEach((doc) => {
+            const data = { id: doc.id, ...doc.data() };
+            
+            let fechaPost = 0;
+            if (data.fecha) {
+                if (typeof data.fecha.toDate === 'function') {
+                    fechaPost = data.fecha.toDate().getTime();
+                } else {
+                    fechaPost = new Date(data.fecha).getTime();
+                }
+            }
+            
+            if (data.categoria === "Historia") {
+                if (fechaPost > limite24h) {
+                    historiasActivas.push(data); 
+                }
+            } else {
+                todosLosPosts.push(data); 
+            }
+        });
+        
+        pintarVitrinaHistorias();
+        pintarMuro();
+    });
+
+    function pintarVitrinaHistorias() {
+        const contenedorDiv = document.getElementById('historias-container');
+        const scrollDiv = document.getElementById('historias-scroll');
+        scrollDiv.innerHTML = "";
+
+        if (historiasActivas.length > 0) {
+            contenedorDiv.style.display = "block";
+            historiasActivas.forEach((historia, index) => {
+                let fotoPortada = (historia.fotos && historia.fotos.length > 0) ? historia.fotos[0] : (historia.foto || "https://via.placeholder.com/100");
+                let estadoAro = historiasVistas.includes(historia.id) ? "seen" : "unseen";
+                
+                scrollDiv.innerHTML += `
+                    <div class="story-item" onclick="abrirHistoria(${index})">
+                        <div class="story-ring ${estadoAro}">
+                            <img src="${fotoPortada}">
+                        </div>
+                        <div class="story-author">${historia.autor}</div>
+                    </div>
+                `;
+            });
+        } else {
+            contenedorDiv.style.display = "none";
+        }
+    }
+
+    window.abrirHistoria = (index) => {
+        const historia = historiasActivas[index];
+        const foto = (historia.fotos && historia.fotos.length > 0) ? historia.fotos[0] : historia.foto;
+        
+        if(!historiasVistas.includes(historia.id)) {
+            historiasVistas.push(historia.id);
+            localStorage.setItem('historias_vistas', JSON.stringify(historiasVistas));
+            pintarVitrinaHistorias();
+        }
+
+        document.getElementById('sv-author').innerText = historia.autor;
+        document.getElementById('sv-img').src = foto;
+        document.getElementById('sv-text').innerText = historia.texto || "";
+        
+        document.getElementById('story-viewer').style.display = 'flex';
+
+        clearTimeout(timerCierreHistoria);
+        let barra = document.getElementById('sv-progress');
+        barra.style.transition = 'none';
+        barra.style.width = '0%';
+        
+        setTimeout(() => {
+            barra.style.transition = 'width 10s linear';
+            barra.style.width = '100%';
+        }, 50);
+
+        timerCierreHistoria = setTimeout(() => {
+            cerrarHistoria();
+        }, 10000);
+    };
+
+    window.cerrarHistoria = () => {
+        clearTimeout(timerCierreHistoria);
+        document.getElementById('story-viewer').style.display = 'none';
+        document.getElementById('sv-img').src = "";
+        document.getElementById('sv-progress').style.transition = 'none';
+        document.getElementById('sv-progress').style.width = '0%';
+    };
 
     window.filtrar = (cat) => {
         filtroActual = cat;
@@ -274,31 +432,22 @@
         pintarMuro();
     };
 
-    const q = query(collection(db, "mensajes"), orderBy("fecha", "desc"));
-    onSnapshot(q, (snapshot) => {
-        todosLosPosts = [];
-        snapshot.forEach((doc) => {
-            todosLosPosts.push({ id: doc.id, ...doc.data() });
-        });
-        pintarMuro();
-    });
-
     function pintarMuro() {
         const muro = document.getElementById('muro');
         muro.innerHTML = "";
         const esAdmin = localStorage.getItem('familia_auth') === "ticoadmin2026";
         const miNombre = localStorage.getItem('user_n'); 
         let ultimoMes = "";
-
+        
         const postsAmostrar = todosLosPosts.filter(p => filtroActual === 'Todo' || p.categoria === filtroActual);
 
         if(postsAmostrar.length === 0) {
-            muro.innerHTML = `<div style="text-align:center; padding:30px; color:#94a3b8; font-size:14px;">Nada en "${filtroActual}"... ¡Sube la primera foto! 📸</div>`;
+            muro.innerHTML = `<div style="text-align:center; padding:30px; color:#94a3b8;">No hay nada que mostrar aquí... 📸</div>`;
             return;
         }
 
         postsAmostrar.forEach((data) => {
-            const fechaObj = data.fecha ? data.fecha.toDate() : new Date();
+            const fechaObj = data.fecha ? (typeof data.fecha.toDate === 'function' ? data.fecha.toDate() : new Date(data.fecha)) : new Date();
             const mesActual = fechaObj.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
             const fechaCorta = fechaObj.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
             const catLabel = data.categoria || "Familia"; 
@@ -316,18 +465,13 @@
             }
 
             let imagenesArray = data.fotos || []; 
-            if(imagenesArray.length === 0 && data.foto) {
-                imagenesArray = [data.foto]; 
-            }
+            if(imagenesArray.length === 0 && data.foto) imagenesArray = [data.foto]; 
 
             let carouselHtml = `<div class="post-carousel">`;
-            imagenesArray.forEach(url => {
-                carouselHtml += `<img src="${url}" onclick="window.abrirLupa('${url}')">`;
-            });
+            imagenesArray.forEach(url => { carouselHtml += `<img src="${url}" onclick="window.abrirLupa('${url}')">`; });
             carouselHtml += `</div>`;
-
+            
             let swipeIndicator = imagenesArray.length > 1 ? `<div class="swipe-indicator">👉 Desliza para ver más (${imagenesArray.length} fotos)</div>` : "";
-
             let comentariosHtml = data.comentarios ? data.comentarios.map(c => `<div class="comment"><b>${c.autor}:</b> ${c.texto}</div>`).join('') : "";
 
             muro.innerHTML += `
@@ -340,7 +484,6 @@
                         </div>
                     </div>
                     <p>${data.texto}</p>
-                    
                     ${carouselHtml}
                     ${swipeIndicator}
                     
@@ -357,17 +500,15 @@
         });
     }
 
+    // 🟢 FUNCIONES GLOBALES RESTAURADAS (LIKES, COMENTARIOS, BORRAR)
     window.darLike = async (id) => {
         const nombre = getNombre();
         if(!nombre) return;
-
         const docRef = doc(db, "mensajes", id);
         const docSnap = await getDoc(docRef);
-
         if (docSnap.exists()) {
             const data = docSnap.data();
             const lista = data.likesBy || [];
-
             if (lista.includes(nombre)) {
                 await updateDoc(docRef, { likesBy: arrayRemove(nombre) });
             } else {
@@ -383,6 +524,7 @@
         await updateDoc(doc(db, "mensajes", id), { comentarios: arrayUnion({ autor: nombre, texto: input.value }) });
         input.value = "";
     };
+
     window.borrarPost = async (id) => {
         if(confirm("¿Borrar este recuerdo?")) await deleteDoc(doc(db, "mensajes", id));
     };
