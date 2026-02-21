@@ -70,14 +70,12 @@
         .btn-post { background: var(--accent-blue); color: white; padding: 16px; border-radius: 18px; font-weight: 700; cursor: pointer; display: block; text-align: center; margin-bottom: 10px; transition: transform 0.2s; }
         #status-msg { text-align: center; font-size: 12px; color: #94a3b8; margin-bottom: 20px; min-height: 15px; font-weight: bold; }
 
-        /* 🎨 NUEVO COLOR DE FONDO (Gris Plata Suave) Y BORDES */
+        /* 🎨 FONDO GRIS PLATA SUAVE */
         .post { background: #e2e8f0; border-radius: 28px; padding: 20px; margin-bottom: 25px; color: #0f172a; position: relative; box-shadow: 0 15px 35px rgba(0,0,0,0.5); border: 2px solid #cbd5e1; }
         
         .post-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .post-author { font-weight: 800; color: #1d4ed8; font-size: 14px; }
         .category-badge { font-size: 10px; background: #dbeafe; color: #1e40af; padding: 4px 8px; border-radius: 8px; font-weight: 800; margin-left: 8px; text-transform: uppercase; border: 1px solid #bfdbfe; }
-        
-        /* 🎨 LETRAS MÁS OSCURAS PARA MEJOR CONTRASTE */
         .post-date { font-size: 11px; color: #475569; font-weight: 700; } 
         
         .btn-delete-admin { background: #ff4757; color: white; border: none; padding: 6px 10px; border-radius: 10px; cursor: pointer; margin-left: 10px; }
@@ -88,15 +86,12 @@
         .post-carousel::-webkit-scrollbar-thumb { background: #64748b; border-radius: 10px; }
         .post-carousel img { scroll-snap-align: center; flex: 0 0 100%; width: 100%; border-radius: 20px; object-fit: cover; cursor: pointer; border: 1px solid #cbd5e1; }
         
-        /* 🎨 LETRAS MÁS OSCURAS PARA EL SWIPE Y LOS LIKES */
         .swipe-indicator { font-size: 11px; color: #475569; text-align: right; margin-top: -5px; margin-bottom: 10px; font-style: italic; font-weight: 700; }
         
-        /* BOTÓN DE LIKE BLANCO PARA QUE RESALTE SOBRE EL GRIS */
         .btn-like { background: #ffffff; color: #334155; border: 1px solid #cbd5e1; padding: 10px 15px; border-radius: 12px; cursor: pointer; font-weight: 800; width: 100%; text-align: left; margin-bottom: 5px; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .btn-like.liked { background: #fff5f5; color: #ff4757; border-color: #ff4757; }
         .likes-list { font-size: 11px; color: #475569; margin-bottom: 15px; margin-left: 5px; font-style: italic; font-weight: 700; }
 
-        /* CAJA DE COMENTARIOS BLANCA PARA QUE RESALTE */
         .comments-section { background: #ffffff; padding: 12px; border-radius: 18px; border: 1px solid #cbd5e1; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
         .comment { font-size: 13px; margin-bottom: 8px; border-bottom: 1px solid #f1f5f9; padding-bottom: 6px; color: #1e293b; }
         .comment b { color: #0f172a; font-weight: 800; }
@@ -104,9 +99,14 @@
         .comment-input { flex: 1; border: 1px solid #cbd5e1; border-radius: 10px; padding: 8px; font-size: 13px; outline: none; background: #f8fafc; color: #0f172a; font-weight: 600; }
         .btn-send-comment { background: var(--accent-blue); color: white; border: none; padding: 8px 12px; border-radius: 10px; cursor: pointer; font-weight: bold; }
 
+        /* 🟢 LUPA DE FOTOS Y BOTÓN "X" NUEVO */
         #photo-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 5000; overflow: auto; justify-content: center; align-items: center; touch-action: none; }
         #modal-img { max-width: 100%; max-height: 100%; object-fit: contain; cursor: zoom-out; transition: transform 0.2s; }
-        #close-modal-btn { position: fixed; top: 20px; right: 20px; color: white; font-size: 30px; cursor: pointer; z-index: 5001; background: rgba(0,0,0,0.5); width: 45px; height: 45px; text-align: center; line-height: 45px; border-radius: 50%; border: 2px solid white; }
+        
+        /* 🔥 AQUÍ ESTÁ EL BOTÓN CERRAR PREMIUM 🔥 */
+        #close-modal-btn { position: fixed; top: 20px; right: 20px; z-index: 5001; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(8px); width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 50%; box-shadow: 0 4px 15px rgba(0,0,0,0.5); cursor: pointer; transition: 0.2s; }
+        #close-modal-btn:active { transform: scale(0.9); }
+        #close-modal-btn svg { width: 22px; height: 22px; stroke: white; }
 
         /* 🟢 BOTÓN WHATSAPP */
         .btn-wa-familia { position: fixed; bottom: 85px; right: 20px; background: #25D366; color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 0 20px rgba(37,211,102,0.4); z-index: 5500; transition: 0.3s; }
@@ -187,7 +187,12 @@
 </div>
 
 <div id="photo-modal">
-    <div id="close-modal-btn" onclick="cerrarLupa()">✕</div>
+    <div id="close-modal-btn" onclick="cerrarLupa()">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+    </div>
     <img id="modal-img" src="">
 </div>
 
