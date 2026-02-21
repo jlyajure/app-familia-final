@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <title>Laboratorio Familia</title>
+    <title>Familia</title>
     <meta name="apple-mobile-web-app-title" content="Familia">
     <meta name="application-name" content="Familia">
     
@@ -13,7 +13,9 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f172a">
     
+    <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="https://img.icons8.com/emoji/192/house-with-garden.png">
+    <link rel="apple-touch-icon" href="https://img.icons8.com/emoji/192/house-with-garden.png">
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     
@@ -105,23 +107,28 @@
         #photo-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 5000; overflow: auto; justify-content: center; align-items: center; touch-action: none; }
         #modal-img { max-width: 100%; max-height: 100%; object-fit: contain; cursor: zoom-out; transition: transform 0.2s; }
         #close-modal-btn { position: fixed; top: 20px; right: 20px; color: white; font-size: 30px; cursor: pointer; z-index: 5001; background: rgba(0,0,0,0.5); width: 45px; height: 45px; text-align: center; line-height: 45px; border-radius: 50%; border: 2px solid white; }
+
+        /* 🟢 BOTÓN WHATSAPP */
+        .btn-wa-familia { position: fixed; bottom: 85px; right: 20px; background: #25D366; color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 0 20px rgba(37,211,102,0.4); z-index: 5500; transition: 0.3s; }
+        .btn-wa-familia:hover { transform: scale(1.1); box-shadow: 0 0 30px rgba(37,211,102,0.8); }
+        .btn-wa-familia svg { width: 32px; height: 32px; fill: currentColor; }
     </style>
 </head>
 <body>
 
 <div id="login-screen">
     <div class="login-card">
-        <div style="font-size: 45px; margin-bottom: 15px;">🧪</div>
-        <h2 style="color: white; margin: 0;">Laboratorio Pruebas</h2>
+        <div style="font-size: 45px; margin-bottom: 15px;">🌅</div>
+        <h2 style="color: white; margin: 0;">Nuestros Recuerdos</h2>
         <input type="password" id="passInput" placeholder="Clave de acceso">
-        <button id="btnEntrar">ENTRAR AL LAB</button>
+        <button id="btnEntrar">ENTRAR</button>
     </div>
 </div>
 
 <div id="app-content">
     <header>
-        <h1 style="font-size: 18px; margin:0; color:white;">Familia (LAB)</h1>
-        <button onclick="localStorage.removeItem('familia_auth_lab'); location.reload();" style="background:rgba(255,255,255,0.1); color:#94a3b8; border:none; padding:10px; border-radius:10px; cursor:pointer;">Salir 🔒</button>
+        <h1 style="font-size: 18px; margin:0; color:white;">Familia</h1>
+        <button onclick="localStorage.removeItem('familia_auth'); location.reload();" style="background:rgba(255,255,255,0.1); color:#94a3b8; border:none; padding:10px; border-radius:10px; cursor:pointer;">Salir 🔒</button>
     </header>
     <div class="container">
         
@@ -139,6 +146,8 @@
             <button class="filter-btn" onclick="filtrar('Recuerdos')">📜 Recuerdos</button>
             <button class="filter-btn" onclick="filtrar('Jodedera')">🤣 Jodedera</button>
         </div>
+
+        <a id="wa-notice" href="#" target="_blank">📢 ¡AVISAR POR WHATSAPP!</a>
 
         <label for="fotoInput" id="labelPost" class="btn-post">✨ SUBIR FOTO O HISTORIA</label>
         
@@ -198,15 +207,15 @@
     let historiasActivas = [];
     let filtroActual = 'Todo';
     let timerCierreHistoria; 
-    let historiasVistas = JSON.parse(localStorage.getItem('historias_vistas_lab')) || [];
+    let historiasVistas = JSON.parse(localStorage.getItem('historias_vistas')) || [];
 
     const getNombre = () => {
-        let n = localStorage.getItem('user_n_lab');
-        if(!n) { n = prompt("👤 Escribe tu nombre para el Laboratorio:"); if(n) localStorage.setItem('user_n_lab', n); }
+        let n = localStorage.getItem('user_n');
+        if(!n) { n = prompt("👤 Escribe tu nombre:"); if(n) localStorage.setItem('user_n', n); }
         return n;
     };
 
-    if(localStorage.getItem('familia_auth_lab')) {
+    if(localStorage.getItem('familia_auth')) {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-content').style.display = 'block';
         getNombre();
@@ -215,12 +224,12 @@
     const intentarIngreso = () => {
         const val = document.getElementById('passInput').value.trim().toLowerCase(); 
         if(val === CLAVE_NORMAL || val === CLAVE_ADMIN) {
-            localStorage.setItem('familia_auth_lab', val);
+            localStorage.setItem('familia_auth', val);
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('app-content').style.display = 'block';
             getNombre();
         } else {
-            alert("Clave incorrecta 🛑");
+            alert("Clave incorrecta 🛑 (Revisa que no tengas un espacio en blanco al final)");
         }
     };
 
@@ -279,7 +288,7 @@
             }
             
             if (urlsSubidas.length > 0) {
-                status.innerHTML = "📝 Guardando en el Laboratorio...";
+                status.innerHTML = "📝 Guardando recuerdo...";
                 await addDoc(collection(db, "mensajes"), {
                     texto: mensaje || "", 
                     fotos: urlsSubidas, 
@@ -292,6 +301,12 @@
                 label.innerHTML = "✨ SUBIR FOTO O HISTORIA";
                 status.innerHTML = "✅ ¡Listo!";
                 document.getElementById('upload-options').style.display = 'none';
+                
+                if (cat !== "Historia") {
+                    document.getElementById('wa-notice').style.display = "block";
+                    document.getElementById('wa-notice').href = `https://wa.me/?text=¡Nuevo+recuerdo+en+${cat}!`;
+                }
+                
                 document.getElementById('fotoInput').value = ""; 
             }
         } catch (err) { 
@@ -362,7 +377,7 @@
     window.abrirHistoria = (index) => {
         const historia = historiasActivas[index];
         const foto = (historia.fotos && historia.fotos.length > 0) ? historia.fotos[0] : historia.foto;
-        if(!historiasVistas.includes(historia.id)) { historiasVistas.push(historia.id); localStorage.setItem('historias_vistas_lab', JSON.stringify(historiasVistas)); pintarVitrinaHistorias(); }
+        if(!historiasVistas.includes(historia.id)) { historiasVistas.push(historia.id); localStorage.setItem('historias_vistas', JSON.stringify(historiasVistas)); pintarVitrinaHistorias(); }
         document.getElementById('sv-author').innerText = historia.autor;
         document.getElementById('sv-img').src = foto;
         document.getElementById('sv-text').innerText = historia.texto || "";
@@ -385,8 +400,8 @@
     function pintarMuro() {
         const muro = document.getElementById('muro');
         muro.innerHTML = "";
-        const esAdmin = localStorage.getItem('familia_auth_lab') === "ticoadmin2026";
-        const miNombre = localStorage.getItem('user_n_lab'); 
+        const esAdmin = localStorage.getItem('familia_auth') === "ticoadmin2026";
+        const miNombre = localStorage.getItem('user_n'); 
         let ultimoMes = "";
         const postsAmostrar = todosLosPosts.filter(p => filtroActual === 'Todo' || p.categoria === filtroActual);
 
@@ -454,6 +469,17 @@
     };
 
     window.borrarPost = async (id) => { if(confirm("¿Borrar este recuerdo?")) await deleteDoc(doc(db, "mensajes", id)); };
+
+    // 👮‍♂️ EL VIGILANTE PARA PANTALLA COMPLETA
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('sw.js').then(function(registration) {
+                console.log('Vigilante contratado con éxito');
+            }, function(err) {
+                console.log('Falló el contrato del vigilante:', err);
+            });
+        });
+    }
 </script>
 
 </body>
