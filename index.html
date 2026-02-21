@@ -2,9 +2,9 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <title>Familia</title>
+    <title>Laboratorio Familia</title>
     <meta name="apple-mobile-web-app-title" content="Familia">
     <meta name="application-name" content="Familia">
     
@@ -13,10 +13,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f172a">
     
-    <link rel="manifest" href="manifest.json">
-    
     <link rel="icon" type="image/png" href="https://img.icons8.com/emoji/192/house-with-garden.png">
-    <link rel="apple-touch-icon" href="https://img.icons8.com/emoji/192/house-with-garden.png">
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     
@@ -49,7 +46,7 @@
         .story-author { font-size: 11px; color: #e2e8f0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-align: center; font-weight: 600; }
 
         /* 🟢 VISOR DE HISTORIAS */
-        #story-viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 6000; flex-direction: column; }
+        #story-viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 6000; flex-direction: column; touch-action: none; }
         .story-progress-container { position: absolute; top: 10px; left: 10px; right: 10px; height: 3px; background: rgba(255,255,255,0.3); border-radius: 3px; z-index: 6002; overflow: hidden; }
         .story-progress-fill { height: 100%; background: white; width: 0%; border-radius: 3px; }
         .story-header { position: absolute; top: 15px; left: 0; width: 100%; padding: 20px; display: flex; justify-content: space-between; align-items: center; z-index: 6001; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); }
@@ -66,64 +63,65 @@
         .filter-btn.active { background: var(--accent-blue); border-color: var(--accent-blue); font-weight: 800; }
 
         .category-select { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 15px; background: rgba(255,255,255,0.9); border: none; font-size: 14px; color: #1e293b; font-weight: bold; }
-        
         .month-separator { background: rgba(59, 130, 246, 0.2); color: #93c5fd; padding: 8px 20px; border-radius: 50px; font-size: 12px; font-weight: 800; text-align: center; margin: 30px 0 15px 0; border: 1px solid rgba(59, 130, 246, 0.3); letter-spacing: 2px; text-transform: uppercase; }
         
         .btn-post { background: var(--accent-blue); color: white; padding: 16px; border-radius: 18px; font-weight: 700; cursor: pointer; display: block; text-align: center; margin-bottom: 10px; transition: transform 0.2s; }
-        
         #status-msg { text-align: center; font-size: 12px; color: #94a3b8; margin-bottom: 20px; min-height: 15px; font-weight: bold; }
-        #wa-notice { display: none; background: var(--wa-green); color: white; padding: 15px; border-radius: 22px; text-align: center; font-weight: 800; text-decoration: none; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(37,211,102,0.3); }
 
-        .post { background: white; border-radius: 28px; padding: 20px; margin-bottom: 25px; color: #1e293b; position: relative; box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
+        /* 🎨 NUEVO COLOR DE FONDO (Gris Plata Suave) Y BORDES */
+        .post { background: #e2e8f0; border-radius: 28px; padding: 20px; margin-bottom: 25px; color: #0f172a; position: relative; box-shadow: 0 15px 35px rgba(0,0,0,0.5); border: 2px solid #cbd5e1; }
+        
         .post-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .post-author { font-weight: 800; color: var(--accent-blue); font-size: 14px; }
-        .category-badge { font-size: 10px; background: #e0f2fe; color: #0284c7; padding: 4px 8px; border-radius: 8px; font-weight: 700; margin-left: 8px; text-transform: uppercase; }
-        .post-date { font-size: 11px; color: #94a3b8; font-weight: 600; }
+        .post-author { font-weight: 800; color: #1d4ed8; font-size: 14px; }
+        .category-badge { font-size: 10px; background: #dbeafe; color: #1e40af; padding: 4px 8px; border-radius: 8px; font-weight: 800; margin-left: 8px; text-transform: uppercase; border: 1px solid #bfdbfe; }
+        
+        /* 🎨 LETRAS MÁS OSCURAS PARA MEJOR CONTRASTE */
+        .post-date { font-size: 11px; color: #475569; font-weight: 700; } 
         
         .btn-delete-admin { background: #ff4757; color: white; border: none; padding: 6px 10px; border-radius: 10px; cursor: pointer; margin-left: 10px; }
         
         .post-carousel { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 10px; margin: 10px 0; padding-bottom: 5px; -webkit-overflow-scrolling: touch; }
         .post-carousel::-webkit-scrollbar { height: 6px; }
-        .post-carousel::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
-        .post-carousel::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .post-carousel img { scroll-snap-align: center; flex: 0 0 100%; width: 100%; border-radius: 20px; object-fit: cover; cursor: pointer; }
-        .swipe-indicator { font-size: 11px; color: #94a3b8; text-align: right; margin-top: -5px; margin-bottom: 10px; font-style: italic; }
+        .post-carousel::-webkit-scrollbar-track { background: #cbd5e1; border-radius: 10px; }
+        .post-carousel::-webkit-scrollbar-thumb { background: #64748b; border-radius: 10px; }
+        .post-carousel img { scroll-snap-align: center; flex: 0 0 100%; width: 100%; border-radius: 20px; object-fit: cover; cursor: pointer; border: 1px solid #cbd5e1; }
         
-        .btn-like { background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; padding: 8px 15px; border-radius: 12px; cursor: pointer; font-weight: 700; width: 100%; text-align: left; margin-bottom: 5px; transition: 0.3s; }
+        /* 🎨 LETRAS MÁS OSCURAS PARA EL SWIPE Y LOS LIKES */
+        .swipe-indicator { font-size: 11px; color: #475569; text-align: right; margin-top: -5px; margin-bottom: 10px; font-style: italic; font-weight: 700; }
+        
+        /* BOTÓN DE LIKE BLANCO PARA QUE RESALTE SOBRE EL GRIS */
+        .btn-like { background: #ffffff; color: #334155; border: 1px solid #cbd5e1; padding: 10px 15px; border-radius: 12px; cursor: pointer; font-weight: 800; width: 100%; text-align: left; margin-bottom: 5px; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .btn-like.liked { background: #fff5f5; color: #ff4757; border-color: #ff4757; }
-        .likes-list { font-size: 11px; color: #64748b; margin-bottom: 15px; margin-left: 5px; font-style: italic; }
+        .likes-list { font-size: 11px; color: #475569; margin-bottom: 15px; margin-left: 5px; font-style: italic; font-weight: 700; }
 
-        .comments-section { background: #f8fafc; padding: 12px; border-radius: 18px; }
-        .comment { font-size: 13px; margin-bottom: 6px; border-bottom: 1px solid #edf2f7; padding-bottom: 4px; }
+        /* CAJA DE COMENTARIOS BLANCA PARA QUE RESALTE */
+        .comments-section { background: #ffffff; padding: 12px; border-radius: 18px; border: 1px solid #cbd5e1; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        .comment { font-size: 13px; margin-bottom: 8px; border-bottom: 1px solid #f1f5f9; padding-bottom: 6px; color: #1e293b; }
+        .comment b { color: #0f172a; font-weight: 800; }
         .comment-input-group { display: flex; gap: 8px; margin-top: 10px; }
-        .comment-input { flex: 1; border: 1px solid #e2e8f0; border-radius: 10px; padding: 8px; font-size: 13px; outline: none; }
-        .btn-send-comment { background: var(--accent-blue); color: white; border: none; padding: 8px 12px; border-radius: 10px; cursor: pointer; }
+        .comment-input { flex: 1; border: 1px solid #cbd5e1; border-radius: 10px; padding: 8px; font-size: 13px; outline: none; background: #f8fafc; color: #0f172a; font-weight: 600; }
+        .btn-send-comment { background: var(--accent-blue); color: white; border: none; padding: 8px 12px; border-radius: 10px; cursor: pointer; font-weight: bold; }
 
-        #photo-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 5000; overflow: auto; justify-content: center; align-items: center; }
-        #modal-img { max-width: 100%; max-height: 100%; object-fit: contain; cursor: zoom-in; transition: transform 0.2s; }
+        #photo-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 5000; overflow: auto; justify-content: center; align-items: center; touch-action: none; }
+        #modal-img { max-width: 100%; max-height: 100%; object-fit: contain; cursor: zoom-out; transition: transform 0.2s; }
         #close-modal-btn { position: fixed; top: 20px; right: 20px; color: white; font-size: 30px; cursor: pointer; z-index: 5001; background: rgba(0,0,0,0.5); width: 45px; height: 45px; text-align: center; line-height: 45px; border-radius: 50%; border: 2px solid white; }
-
-        /* 🟢 BOTÓN WHATSAPP */
-        .btn-wa-familia { position: fixed; bottom: 85px; right: 20px; background: #25D366; color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 0 20px rgba(37,211,102,0.4); z-index: 5500; transition: 0.3s; }
-        .btn-wa-familia:hover { transform: scale(1.1); box-shadow: 0 0 30px rgba(37,211,102,0.8); }
-        .btn-wa-familia svg { width: 32px; height: 32px; fill: currentColor; }
     </style>
 </head>
 <body>
 
 <div id="login-screen">
     <div class="login-card">
-        <div style="font-size: 45px; margin-bottom: 15px;">🌅</div>
-        <h2 style="color: white; margin: 0;">Nuestros Recuerdos</h2>
+        <div style="font-size: 45px; margin-bottom: 15px;">🧪</div>
+        <h2 style="color: white; margin: 0;">Laboratorio Pruebas</h2>
         <input type="password" id="passInput" placeholder="Clave de acceso">
-        <button id="btnEntrar">ENTRAR</button>
+        <button id="btnEntrar">ENTRAR AL LAB</button>
     </div>
 </div>
 
 <div id="app-content">
     <header>
-        <h1 style="font-size: 18px; margin:0; color:white;">Familia</h1>
-        <button onclick="localStorage.removeItem('familia_auth'); location.reload();" style="background:rgba(255,255,255,0.1); color:#94a3b8; border:none; padding:10px; border-radius:10px; cursor:pointer;">Salir 🔒</button>
+        <h1 style="font-size: 18px; margin:0; color:white;">Familia (LAB)</h1>
+        <button onclick="localStorage.removeItem('familia_auth_lab'); location.reload();" style="background:rgba(255,255,255,0.1); color:#94a3b8; border:none; padding:10px; border-radius:10px; cursor:pointer;">Salir 🔒</button>
     </header>
     <div class="container">
         
@@ -141,8 +139,6 @@
             <button class="filter-btn" onclick="filtrar('Recuerdos')">📜 Recuerdos</button>
             <button class="filter-btn" onclick="filtrar('Jodedera')">🤣 Jodedera</button>
         </div>
-
-        <a id="wa-notice" href="#" target="_blank">📢 ¡AVISAR POR WHATSAPP!</a>
 
         <label for="fotoInput" id="labelPost" class="btn-post">✨ SUBIR FOTO O HISTORIA</label>
         
@@ -186,10 +182,6 @@
     <img id="modal-img" src="">
 </div>
 
-<a href="https://wa.me/584125852879" target="_blank" class="btn-wa-familia" title="Escríbenos al WhatsApp">
-    <svg viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 19.84C10.57 19.84 9.14 19.45 7.9 18.71L7.61 18.54L4.47 19.36L5.31 16.3L5.12 16C4.33 14.78 3.91 13.36 3.91 11.91C3.91 7.43 7.56 3.79 12.05 3.79C14.22 3.79 16.27 4.64 17.8 6.18C19.34 7.71 20.19 9.76 20.19 11.92C20.19 16.4 16.54 20.04 12.05 20.04M16.52 13.79C16.27 13.67 15.06 13.07 14.83 12.99C14.6 12.91 14.43 12.87 14.27 13.11C14.1 13.36 13.64 13.92 13.5 14.09C13.36 14.27 13.21 14.29 12.96 14.17C12.72 14.04 11.92 13.78 10.97 12.94C10.23 12.28 9.72 11.45 9.58 11.2C9.43 10.96 9.56 10.82 9.69 10.7C9.8 10.59 9.94 10.42 10.06 10.28C10.18 10.13 10.23 10.03 10.3 9.87C10.39 9.7 10.34 9.56 10.28 9.44C10.22 9.32 9.72 8.1 9.52 7.6C9.32 7.12 9.12 7.18 8.97 7.18C8.83 7.18 8.66 7.18 8.5 7.18C8.34 7.18 8.08 7.24 7.85 7.5C7.63 7.76 7 8.35 7 9.55C7 10.75 7.88 11.91 8 12.08C8.13 12.25 9.73 14.71 12.18 15.76C12.76 16.01 13.22 16.16 13.58 16.27C14.16 16.45 14.69 16.41 15.11 16.35C15.58 16.28 16.52 15.78 16.72 15.22C16.92 14.66 16.92 14.18 16.85 14.09C16.78 13.99 16.63 13.93 16.38 13.8L16.52 13.79Z"/></svg>
-</a>
-
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, updateDoc, arrayUnion, arrayRemove, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -206,15 +198,15 @@
     let historiasActivas = [];
     let filtroActual = 'Todo';
     let timerCierreHistoria; 
-    let historiasVistas = JSON.parse(localStorage.getItem('historias_vistas')) || [];
+    let historiasVistas = JSON.parse(localStorage.getItem('historias_vistas_lab')) || [];
 
     const getNombre = () => {
-        let n = localStorage.getItem('user_n');
-        if(!n) { n = prompt("👤 Escribe tu nombre:"); if(n) localStorage.setItem('user_n', n); }
+        let n = localStorage.getItem('user_n_lab');
+        if(!n) { n = prompt("👤 Escribe tu nombre para el Laboratorio:"); if(n) localStorage.setItem('user_n_lab', n); }
         return n;
     };
 
-    if(localStorage.getItem('familia_auth')) {
+    if(localStorage.getItem('familia_auth_lab')) {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-content').style.display = 'block';
         getNombre();
@@ -223,12 +215,12 @@
     const intentarIngreso = () => {
         const val = document.getElementById('passInput').value.trim().toLowerCase(); 
         if(val === CLAVE_NORMAL || val === CLAVE_ADMIN) {
-            localStorage.setItem('familia_auth', val);
+            localStorage.setItem('familia_auth_lab', val);
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('app-content').style.display = 'block';
             getNombre();
         } else {
-            alert("Clave incorrecta 🛑 (Revisa que no tengas un espacio en blanco al final)");
+            alert("Clave incorrecta 🛑");
         }
     };
 
@@ -287,7 +279,7 @@
             }
             
             if (urlsSubidas.length > 0) {
-                status.innerHTML = "📝 Guardando recuerdo...";
+                status.innerHTML = "📝 Guardando en el Laboratorio...";
                 await addDoc(collection(db, "mensajes"), {
                     texto: mensaje || "", 
                     fotos: urlsSubidas, 
@@ -300,12 +292,6 @@
                 label.innerHTML = "✨ SUBIR FOTO O HISTORIA";
                 status.innerHTML = "✅ ¡Listo!";
                 document.getElementById('upload-options').style.display = 'none';
-                
-                if (cat !== "Historia") {
-                    document.getElementById('wa-notice').style.display = "block";
-                    document.getElementById('wa-notice').href = `https://wa.me/?text=¡Nuevo+recuerdo+en+${cat}!`;
-                }
-                
                 document.getElementById('fotoInput').value = ""; 
             }
         } catch (err) { 
@@ -343,23 +329,9 @@
 
         snapshot.forEach((doc) => {
             const data = { id: doc.id, ...doc.data() };
-            
-            let fechaPost = 0;
-            if (data.fecha) {
-                if (typeof data.fecha.toDate === 'function') {
-                    fechaPost = data.fecha.toDate().getTime();
-                } else {
-                    fechaPost = new Date(data.fecha).getTime();
-                }
-            }
-            
-            if (data.categoria === "Historia") {
-                if (fechaPost > limite24h) {
-                    historiasActivas.push(data); 
-                }
-            } else {
-                todosLosPosts.push(data); 
-            }
+            let fechaPost = data.fecha ? (typeof data.fecha.toDate === 'function' ? data.fecha.toDate().getTime() : new Date(data.fecha).getTime()) : 0;
+            if (data.categoria === "Historia") { if (fechaPost > limite24h) historiasActivas.push(data); } 
+            else { todosLosPosts.push(data); }
         });
         
         pintarVitrinaHistorias();
@@ -376,15 +348,11 @@
             historiasActivas.forEach((historia, index) => {
                 let fotoPortada = (historia.fotos && historia.fotos.length > 0) ? historia.fotos[0] : (historia.foto || "https://via.placeholder.com/100");
                 let estadoAro = historiasVistas.includes(historia.id) ? "seen" : "unseen";
-                
                 scrollDiv.innerHTML += `
                     <div class="story-item" onclick="abrirHistoria(${index})">
-                        <div class="story-ring ${estadoAro}">
-                            <img src="${fotoPortada}">
-                        </div>
+                        <div class="story-ring ${estadoAro}"><img src="${fotoPortada}"></div>
                         <div class="story-author">${historia.autor}</div>
-                    </div>
-                `;
+                    </div>`;
             });
         } else {
             contenedorDiv.style.display = "none";
@@ -394,71 +362,41 @@
     window.abrirHistoria = (index) => {
         const historia = historiasActivas[index];
         const foto = (historia.fotos && historia.fotos.length > 0) ? historia.fotos[0] : historia.foto;
-        
-        if(!historiasVistas.includes(historia.id)) {
-            historiasVistas.push(historia.id);
-            localStorage.setItem('historias_vistas', JSON.stringify(historiasVistas));
-            pintarVitrinaHistorias();
-        }
-
+        if(!historiasVistas.includes(historia.id)) { historiasVistas.push(historia.id); localStorage.setItem('historias_vistas_lab', JSON.stringify(historiasVistas)); pintarVitrinaHistorias(); }
         document.getElementById('sv-author').innerText = historia.autor;
         document.getElementById('sv-img').src = foto;
         document.getElementById('sv-text').innerText = historia.texto || "";
-        
         document.getElementById('story-viewer').style.display = 'flex';
-
         clearTimeout(timerCierreHistoria);
         let barra = document.getElementById('sv-progress');
-        barra.style.transition = 'none';
-        barra.style.width = '0%';
-        
-        setTimeout(() => {
-            barra.style.transition = 'width 10s linear';
-            barra.style.width = '100%';
-        }, 50);
-
-        timerCierreHistoria = setTimeout(() => {
-            cerrarHistoria();
-        }, 10000);
+        barra.style.transition = 'none'; barra.style.width = '0%';
+        setTimeout(() => { barra.style.transition = 'width 10s linear'; barra.style.width = '100%'; }, 50);
+        timerCierreHistoria = setTimeout(() => { cerrarHistoria(); }, 10000);
     };
 
-    window.cerrarHistoria = () => {
-        clearTimeout(timerCierreHistoria);
-        document.getElementById('story-viewer').style.display = 'none';
-        document.getElementById('sv-img').src = "";
-        document.getElementById('sv-progress').style.transition = 'none';
-        document.getElementById('sv-progress').style.width = '0%';
-    };
+    window.cerrarHistoria = () => { clearTimeout(timerCierreHistoria); document.getElementById('story-viewer').style.display = 'none'; document.getElementById('sv-img').src = ""; };
 
     window.filtrar = (cat) => {
         filtroActual = cat;
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.classList.remove('active');
-            if(btn.innerText.includes(cat) || (cat === 'Todo' && btn.innerText === 'Todo')) btn.classList.add('active');
-        });
+        document.querySelectorAll('.filter-btn').forEach(btn => { btn.classList.remove('active'); if(btn.innerText.includes(cat) || (cat === 'Todo' && btn.innerText === 'Todo')) btn.classList.add('active'); });
         pintarMuro();
     };
 
     function pintarMuro() {
         const muro = document.getElementById('muro');
         muro.innerHTML = "";
-        const esAdmin = localStorage.getItem('familia_auth') === "ticoadmin2026";
-        const miNombre = localStorage.getItem('user_n'); 
+        const esAdmin = localStorage.getItem('familia_auth_lab') === "ticoadmin2026";
+        const miNombre = localStorage.getItem('user_n_lab'); 
         let ultimoMes = "";
-        
         const postsAmostrar = todosLosPosts.filter(p => filtroActual === 'Todo' || p.categoria === filtroActual);
 
-        if(postsAmostrar.length === 0) {
-            muro.innerHTML = `<div style="text-align:center; padding:30px; color:#94a3b8;">No hay nada que mostrar aquí... 📸</div>`;
-            return;
-        }
+        if(postsAmostrar.length === 0) { muro.innerHTML = `<div style="text-align:center; padding:30px; color:#94a3b8;">No hay nada que mostrar aquí... 📸</div>`; return; }
 
         postsAmostrar.forEach((data) => {
             const fechaObj = data.fecha ? (typeof data.fecha.toDate === 'function' ? data.fecha.toDate() : new Date(data.fecha)) : new Date();
             const mesActual = fechaObj.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
             const fechaCorta = fechaObj.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
             const catLabel = data.categoria || "Familia"; 
-            
             const listaLikes = data.likesBy || [];
             const nombresLikes = listaLikes.length > 0 ? `Le gusta a: <b>${listaLikes.join(", ")}</b>` : "";
             const yaDiLike = listaLikes.includes(miNombre); 
@@ -466,18 +404,13 @@
             const totalVisual = listaLikes.length + (data.likes || 0);
             const textoLike = yaDiLike ? `❤️ Te gusta (${totalVisual})` : `🤍 Me gusta (${totalVisual})`;
 
-            if (mesActual !== ultimoMes) {
-                muro.innerHTML += `<div class="month-separator">${mesActual}</div>`;
-                ultimoMes = mesActual;
-            }
+            if (mesActual !== ultimoMes) { muro.innerHTML += `<div class="month-separator">${mesActual}</div>`; ultimoMes = mesActual; }
 
             let imagenesArray = data.fotos || []; 
             if(imagenesArray.length === 0 && data.foto) imagenesArray = [data.foto]; 
-
             let carouselHtml = `<div class="post-carousel">`;
             imagenesArray.forEach(url => { carouselHtml += `<img src="${url}" onclick="window.abrirLupa('${url}')">`; });
             carouselHtml += `</div>`;
-            
             let swipeIndicator = imagenesArray.length > 1 ? `<div class="swipe-indicator">👉 Desliza para ver más (${imagenesArray.length} fotos)</div>` : "";
             let comentariosHtml = data.comentarios ? data.comentarios.map(c => `<div class="comment"><b>${c.autor}:</b> ${c.texto}</div>`).join('') : "";
 
@@ -490,13 +423,11 @@
                             ${esAdmin ? `<button class="btn-delete-admin" onclick="window.borrarPost('${data.id}')">🗑️</button>` : ""}
                         </div>
                     </div>
-                    <p>${data.texto}</p>
+                    <p style="font-weight: 600;">${data.texto}</p>
                     ${carouselHtml}
                     ${swipeIndicator}
-                    
                     <button class="${claseLike}" onclick="darLike('${data.id}')">${textoLike}</button>
                     <div class="likes-list">${nombresLikes}</div>
-                    
                     <div class="comments-section">${comentariosHtml}
                         <div class="comment-input-group">
                             <input type="text" id="input-${data.id}" class="comment-input" placeholder="Opinar...">
@@ -507,34 +438,22 @@
         });
     }
 
-    // 🟢 FUNCIONES GLOBALES
     window.darLike = async (id) => {
-        const nombre = getNombre();
-        if(!nombre) return;
-        const docRef = doc(db, "mensajes", id);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-            const data = docSnap.data();
-            const lista = data.likesBy || [];
-            if (lista.includes(nombre)) {
-                await updateDoc(docRef, { likesBy: arrayRemove(nombre) });
-            } else {
-                await updateDoc(docRef, { likesBy: arrayUnion(nombre) });
-            }
+        const nombre = getNombre(); if(!nombre) return;
+        const docRef = doc(db, "mensajes", id); const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) { const data = docSnap.data(); const lista = data.likesBy || [];
+            if (lista.includes(nombre)) { await updateDoc(docRef, { likesBy: arrayRemove(nombre) }); } 
+            else { await updateDoc(docRef, { likesBy: arrayUnion(nombre) }); }
         }
     };
 
     window.enviarComentario = async (id) => {
-        const input = document.getElementById(`input-${id}`);
-        const nombre = getNombre();
+        const input = document.getElementById(`input-${id}`); const nombre = getNombre();
         if (!input.value || !nombre) return;
-        await updateDoc(doc(db, "mensajes", id), { comentarios: arrayUnion({ autor: nombre, texto: input.value }) });
-        input.value = "";
+        await updateDoc(doc(db, "mensajes", id), { comentarios: arrayUnion({ autor: nombre, texto: input.value }) }); input.value = "";
     };
 
-    window.borrarPost = async (id) => {
-        if(confirm("¿Borrar este recuerdo?")) await deleteDoc(doc(db, "mensajes", id));
-    };
+    window.borrarPost = async (id) => { if(confirm("¿Borrar este recuerdo?")) await deleteDoc(doc(db, "mensajes", id)); };
 </script>
 
 </body>
