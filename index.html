@@ -64,14 +64,37 @@
         .filter-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 8px 16px; border-radius: 20px; margin-right: 8px; font-size: 13px; cursor: pointer; transition: 0.3s; }
         .filter-btn.active { background: var(--accent-blue); border-color: var(--accent-blue); font-weight: 800; }
 
-        .category-select { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 15px; background: rgba(255,255,255,0.9); border: none; font-size: 14px; color: #1e293b; font-weight: bold; }
         .month-separator { background: rgba(59, 130, 246, 0.2); color: #93c5fd; padding: 8px 20px; border-radius: 50px; font-size: 12px; font-weight: 800; text-align: center; margin: 30px 0 15px 0; border: 1px solid rgba(59, 130, 246, 0.3); letter-spacing: 2px; text-transform: uppercase; }
         
         .btn-post { background: var(--accent-blue); color: white; padding: 16px; border-radius: 18px; font-weight: 700; cursor: pointer; display: block; text-align: center; margin-bottom: 10px; transition: transform 0.2s; }
         #status-msg { text-align: center; font-size: 12px; color: #94a3b8; margin-bottom: 20px; min-height: 15px; font-weight: bold; }
-
+        
         #wa-notice { display: none; background: var(--wa-green); color: white; padding: 15px; border-radius: 22px; text-align: center; font-weight: 800; text-decoration: none; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(37,211,102,0.3); }
 
+        /* 🔥 AQUÍ ESTÁ EL SELECTOR (CAJA DE OPCIONES) TOTALMENTE MODERNIZADO 🔥 */
+        .category-select { 
+            width: 100%; 
+            padding: 14px 20px; 
+            margin-bottom: 15px; 
+            border-radius: 18px; 
+            background-color: #f8fafc; 
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23334155' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); 
+            background-repeat: no-repeat; 
+            background-position: right 16px center; 
+            background-size: 16px; 
+            border: 2px solid #cbd5e1; 
+            font-size: 14px; 
+            color: #0f172a; 
+            font-weight: 800; 
+            -webkit-appearance: none; 
+            appearance: none; 
+            cursor: pointer; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+            outline: none;
+        }
+        .category-select:focus { border-color: var(--accent-blue); }
+
+        /* 🎨 FONDO GRIS PLATA SUAVE */
         .post { background: #e2e8f0; border-radius: 28px; padding: 20px; margin-bottom: 25px; color: #0f172a; position: relative; box-shadow: 0 15px 35px rgba(0,0,0,0.5); border: 2px solid #cbd5e1; }
         
         .post-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
@@ -89,7 +112,7 @@
         
         .swipe-indicator { font-size: 11px; color: #475569; text-align: right; margin-top: -5px; margin-bottom: 10px; font-style: italic; font-weight: 700; }
         
-        /* 🔥 BOTÓN "TE GUSTA" CORREGIDO Y COMPACTO 🔥 */
+        /* 🔥 BOTÓN DE "TE GUSTA" COMPACTO Y ALINEADO 🔥 */
         .btn-like { background: #ffffff; color: #334155; border: 1px solid #cbd5e1; padding: 8px 18px; border-radius: 20px; cursor: pointer; font-weight: 800; display: inline-block; margin-bottom: 5px; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .btn-like.liked { background: #fff5f5; color: #ff4757; border-color: #ff4757; }
         .likes-list { font-size: 11px; color: #475569; margin-bottom: 15px; margin-left: 5px; font-style: italic; font-weight: 700; }
@@ -101,6 +124,7 @@
         .comment-input { flex: 1; border: 1px solid #cbd5e1; border-radius: 10px; padding: 8px; font-size: 13px; outline: none; background: #f8fafc; color: #0f172a; font-weight: 600; }
         .btn-send-comment { background: var(--accent-blue); color: white; border: none; padding: 8px 12px; border-radius: 10px; cursor: pointer; font-weight: bold; }
 
+        /* 🟢 LUPA DE FOTOS Y BOTÓN "X" */
         #photo-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 5000; overflow: auto; justify-content: center; align-items: center; touch-action: none; }
         #modal-img { max-width: 100%; max-height: 100%; object-fit: contain; cursor: zoom-out; transition: transform 0.2s; }
         
