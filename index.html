@@ -21,8 +21,36 @@
     
     <style>
         * { box-sizing: border-box; }
-        :root { --accent-blue: #3b82f6; --dark-bg: linear-gradient(180deg, #0f172a 0%, #1e293b 100%); --wa-green: #25d366; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; min-height: 100vh; background: var(--dark-bg); background-attachment: fixed; color: #f8fafc; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
+        
+        /* 🎨 SISTEMA DÍA/NOCHE */
+        :root { 
+            --accent-blue: #3b82f6; 
+            --wa-green: #25d366; 
+            
+            /* MODO NOCHE (Por defecto) */
+            --bg-body: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+            --text-main: #f8fafc;
+            --card-bg: #e2e8f0;
+            --card-text: #0f172a;
+            --input-bg: rgba(255,255,255,0.1);
+            --header-bg: rgba(15, 23, 42, 0.95);
+            --btn-text: white;
+            --filter-active: white;
+        }
+
+        /* MODO DÍA */
+        body.light-mode {
+            --bg-body: linear-gradient(180deg, #f1f5f9 0%, #cbd5e1 100%);
+            --text-main: #1e293b;
+            --card-bg: #ffffff;
+            --card-text: #0f172a;
+            --input-bg: rgba(0,0,0,0.05);
+            --header-bg: rgba(255, 255, 255, 0.95);
+            --btn-text: #0f172a;
+            --filter-active: white;
+        }
+
+        body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; min-height: 100vh; background: var(--bg-body); background-attachment: fixed; color: var(--text-main); overflow-x: hidden; -webkit-tap-highlight-color: transparent; transition: background 0.5s; }
         
         #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&q=80&w=2070') no-repeat center center/cover; display: flex; align-items: flex-start; justify-content: center; z-index: 1000; padding-top: 100px; }
         #login-screen::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); }
@@ -32,10 +60,15 @@
         #btnEntrar:active { transform: scale(0.95); }
         
         #app-content { display: none; padding-bottom: 40px; }
-        header { background: rgba(15, 23, 42, 0.9); padding: 20px; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        
+        header { background: var(--header-bg); padding: 20px; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); transition: background 0.3s; }
+        
+        /* BOTÓN DE MODO NOCHE/DÍA */
+        #theme-toggle { background: none; border: 1px solid rgba(148, 163, 184, 0.5); color: var(--text-main); font-size: 20px; padding: 5px 10px; border-radius: 50%; cursor: pointer; margin-right: 10px; transition: 0.3s; }
+
         .container { max-width: 480px; margin: auto; padding: 20px 15px; }
 
-        /* 🟢 HISTORIAS */
+        /* 🔥 HISTORIAS */
         #historias-container { display: none; margin-bottom: 20px; }
         .historias-title { font-size: 13px; font-weight: 800; color: #94a3b8; margin-bottom: 10px; margin-left: 5px; }
         .historias-scroll { display: flex; overflow-x: auto; gap: 15px; padding-bottom: 10px; -webkit-overflow-scrolling: touch; }
@@ -45,9 +78,9 @@
         .story-ring.unseen { background: #25d366; border: 2px solid #25d366; } 
         .story-ring.seen { background: #64748b; border: 2px solid #64748b; opacity: 0.8; } 
         .story-ring img { width: 100%; height: 100%; border-radius: 50%; border: 2px solid #0f172a; object-fit: cover; }
-        .story-author { font-size: 11px; color: #e2e8f0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-align: center; font-weight: 600; }
+        .story-author { font-size: 11px; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-align: center; font-weight: 600; }
 
-        /* 🟢 VISOR DE HISTORIAS */
+        /* 🔥 VISOR DE HISTORIAS */
         #story-viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 6000; flex-direction: column; touch-action: none; }
         .story-progress-container { position: absolute; top: 10px; left: 10px; right: 10px; height: 3px; background: rgba(255,255,255,0.3); border-radius: 3px; z-index: 6002; overflow: hidden; }
         .story-progress-fill { height: 100%; background: white; width: 0%; border-radius: 3px; }
@@ -57,12 +90,17 @@
         .story-img-container { flex: 1; display: flex; align-items: center; justify-content: center; height: 100%; position: relative; }
         .story-img-container img { max-width: 100%; max-height: 100%; object-fit: contain; }
         .story-text { position: absolute; bottom: 40px; width: 100%; text-align: center; color: white; font-size: 16px; font-weight: 600; text-shadow: 0 2px 8px rgba(0,0,0,1); padding: 0 20px; }
-        
-        /* 🟢 MURO Y FILTROS */
+
+        /* 🔥 BUSCADOR */
+        .search-container { position: relative; margin-bottom: 15px; }
+        .search-input { width: 100%; padding: 12px 15px 12px 45px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.2); background: var(--input-bg); color: var(--text-main); outline: none; font-size: 14px; font-weight: 600; transition: 0.3s; }
+        .search-input:focus { border-color: var(--accent-blue); background: rgba(255,255,255,0.2); }
+        .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); font-size: 16px; opacity: 0.7; }
+
         .filter-scroll { overflow-x: auto; white-space: nowrap; padding-bottom: 10px; margin-bottom: 15px; -webkit-overflow-scrolling: touch; }
         .filter-scroll::-webkit-scrollbar { display: none; }
-        .filter-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 8px 16px; border-radius: 20px; margin-right: 8px; font-size: 13px; cursor: pointer; transition: 0.3s; }
-        .filter-btn.active { background: var(--accent-blue); border-color: var(--accent-blue); font-weight: 800; }
+        .filter-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(148, 163, 184, 0.2); color: var(--text-main); padding: 8px 16px; border-radius: 20px; margin-right: 8px; font-size: 13px; cursor: pointer; transition: 0.3s; }
+        .filter-btn.active { background: var(--accent-blue); border-color: var(--accent-blue); font-weight: 800; color: white; }
 
         .category-select { width: 100%; padding: 14px 20px; margin-bottom: 10px; border-radius: 18px; background-color: #f8fafc; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23334155' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 16px center; background-size: 16px; border: 2px solid #cbd5e1; font-size: 14px; color: #0f172a; font-weight: 800; -webkit-appearance: none; appearance: none; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.05); outline: none; }
         .month-separator { background: rgba(59, 130, 246, 0.2); color: #93c5fd; padding: 8px 20px; border-radius: 50px; font-size: 12px; font-weight: 800; text-align: center; margin: 30px 0 15px 0; border: 1px solid rgba(59, 130, 246, 0.3); letter-spacing: 2px; text-transform: uppercase; }
@@ -70,11 +108,11 @@
         .btn-post { color: white; padding: 16px; border-radius: 18px; font-weight: 700; cursor: pointer; display: block; text-align: center; margin-bottom: 10px; transition: transform 0.2s; border:none; width:100%; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         .btn-post:active { transform: scale(0.95); }
         
-        #create-post-box { background: rgba(255,255,255,0.1); padding: 15px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.2); margin-bottom: 25px; }
+        #create-post-box { background: var(--input-bg); padding: 15px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.2); margin-bottom: 25px; }
         #status-msg { text-align: center; font-size: 12px; color: #94a3b8; margin-bottom: 15px; min-height: 15px; font-weight: bold; }
         #wa-notice { display: none; background: var(--wa-green); color: white; padding: 15px; border-radius: 22px; text-align: center; font-weight: 800; text-decoration: none; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(37,211,102,0.3); }
 
-        .post { background: #e2e8f0; border-radius: 28px; padding: 20px; margin-bottom: 25px; color: #0f172a; position: relative; box-shadow: 0 15px 35px rgba(0,0,0,0.5); border: 2px solid #cbd5e1; }
+        .post { background: var(--card-bg); border-radius: 28px; padding: 20px; margin-bottom: 25px; color: var(--card-text); position: relative; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border: 2px solid #cbd5e1; transition: background 0.3s; }
         .post-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .post-author { font-weight: 800; color: #1d4ed8; font-size: 14px; }
         .category-badge { font-size: 10px; background: #dbeafe; color: #1e40af; padding: 4px 8px; border-radius: 8px; font-weight: 800; margin-left: 8px; text-transform: uppercase; border: 1px solid #bfdbfe; }
@@ -86,11 +124,18 @@
         .post-carousel::-webkit-scrollbar-track { background: #cbd5e1; border-radius: 10px; }
         .post-carousel::-webkit-scrollbar-thumb { background: #64748b; border-radius: 10px; }
         .post-carousel img { scroll-snap-align: center; flex: 0 0 100%; width: 100%; border-radius: 20px; object-fit: cover; cursor: pointer; border: 1px solid #cbd5e1; }
-        
         .swipe-indicator { font-size: 11px; color: #475569; text-align: right; margin-top: -5px; margin-bottom: 10px; font-style: italic; font-weight: 700; }
-        .btn-like { background: #ffffff; color: #334155; border: 1px solid #cbd5e1; padding: 8px 18px; border-radius: 20px; cursor: pointer; font-weight: 800; display: inline-block; margin-bottom: 5px; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .btn-like.liked { background: #fff5f5; color: #ff4757; border-color: #ff4757; }
-        .likes-list { font-size: 11px; color: #475569; margin-bottom: 15px; margin-left: 5px; font-style: italic; font-weight: 700; }
+
+        /* ZONA DE REACCIONES */
+        .reaction-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; position: relative; }
+        .btn-reaction-trigger { background: #ffffff; color: #334155; border: 1px solid #cbd5e1; padding: 8px 14px; border-radius: 20px; cursor: pointer; font-weight: 800; font-size: 14px; transition: 0.2s; display: flex; align-items: center; gap: 5px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .btn-reaction-trigger:active { transform: scale(0.95); }
+        .reaction-dock { display: none; position: absolute; bottom: 45px; left: 0; background: white; padding: 8px; border-radius: 50px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); gap: 10px; z-index: 100; animation: popUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 2px solid #e2e8f0; }
+        @keyframes popUp { from { transform: scale(0.5) translateY(10px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+        .reaction-option { font-size: 24px; cursor: pointer; transition: transform 0.2s; user-select: none; }
+        .reaction-option:hover { transform: scale(1.3); }
+        .reactions-display { font-size: 11px; color: #475569; font-weight: 700; font-style: italic; display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+        .mini-reaction-icon { font-size: 14px; margin-right: 2px; }
 
         .comments-section { background: #ffffff; padding: 12px; border-radius: 18px; border: 1px solid #cbd5e1; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
         .comment { font-size: 13px; margin-bottom: 8px; border-bottom: 1px solid #f1f5f9; padding-bottom: 6px; color: #1e293b; }
@@ -104,6 +149,7 @@
         #close-modal-btn { position: fixed; top: 20px; right: 20px; z-index: 5001; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(8px); width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 50%; box-shadow: 0 4px 15px rgba(0,0,0,0.5); cursor: pointer; transition: 0.2s; }
         #close-modal-btn svg { width: 22px; height: 22px; stroke: white; }
 
+        /* Botón Flotante de WhatsApp */
         .btn-wa-familia { position: fixed; bottom: 85px; right: 20px; background: #25D366; color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 0 20px rgba(37,211,102,0.4); z-index: 5500; transition: 0.3s; }
         .btn-wa-familia:hover { transform: scale(1.1); box-shadow: 0 0 30px rgba(37,211,102,0.8); }
         .btn-wa-familia svg { width: 32px; height: 32px; fill: currentColor; }
@@ -122,11 +168,21 @@
 
 <div id="app-content">
     <header>
-        <h1 style="font-size: 18px; margin:0; color:white;">Familia</h1>
-        <button onclick="localStorage.removeItem('familia_auth'); location.reload();" style="background:rgba(255,255,255,0.1); color:#94a3b8; border:none; padding:10px; border-radius:10px; cursor:pointer;">Salir 🔒</button>
+        <div style="display:flex; align-items:center;">
+            <h1 style="font-size: 18px; margin:0; color:var(--text-main);">Familia</h1>
+        </div>
+        <div>
+            <button id="theme-toggle" onclick="toggleTheme()">☀️</button>
+            <button onclick="localStorage.removeItem('familia_auth'); location.reload();" style="background:rgba(255,255,255,0.1); color:#94a3b8; border:none; padding:10px; border-radius:10px; cursor:pointer;">Salir 🔒</button>
+        </div>
     </header>
     <div class="container">
         
+        <div class="search-container">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" class="search-input" placeholder="Buscar recuerdos (ej: playa, cumpleaños)...">
+        </div>
+
         <div id="historias-container">
             <div class="historias-title">Estados Recientes (24h)</div>
             <div id="historias-scroll" class="historias-scroll"></div>
@@ -145,8 +201,7 @@
         <a id="wa-notice" href="#" target="_blank" style="display:none;">📢 ¡AVISAR POR WHATSAPP!</a>
 
         <div id="create-post-box">
-            <h3 style="margin-top:0; font-size:14px; color:#e2e8f0; text-align:center;">NUEVA PUBLICACIÓN</h3>
-            
+            <h3 style="margin-top:0; font-size:14px; color:#94a3b8; text-align:center;">NUEVA PUBLICACIÓN</h3>
             <select id="categoriaInput" class="category-select">
                 <option value="Familia">🏠 Publicación Normal (Familia)</option>
                 <option value="Fiestas">🎉 Publicación Normal (Fiestas)</option>
@@ -156,11 +211,9 @@
                 <option value="Jodedera">🤣 Publicación Normal (Jodedera)</option>
                 <option value="Historia">⏳ HISTORIA (Desaparece en 24h)</option>
             </select>
-            
             <div style="display:flex; gap:10px;">
                 <label for="fotoInput" id="labelFoto" class="btn-post" style="background:#64748b; font-size:13px; margin-bottom:0; flex:1;">📸 FOTOS</label>
                 <input type="file" id="fotoInput" style="display:none;" accept="image/*" multiple>
-
                 <button id="btnGrabar" class="btn-post" style="background:#ef4444; font-size:13px; margin-bottom:0; flex:1;">🎙️ AUDIO</button>
             </div>
             
@@ -168,11 +221,8 @@
                 🔴 Grabando... (<span id="relojAudio">0</span>s) 
                 <button id="btnStop" style="margin-left:10px; background:#0f172a; color:white; border:none; padding:8px 15px; border-radius:10px; cursor:pointer; font-weight:bold;">Parar ⏹️</button>
             </div>
-            
             <audio id="audioPreview" controls style="display:none; width: 100%; margin-top: 15px; border-radius: 10px;"></audio>
-            
             <button id="btnBorrarAudio" class="btn-post" style="display:none; background:#64748b; font-size:13px; margin-top:5px; padding:10px;">🗑️ DESCARTAR AUDIO</button>
-
             <button id="btnPublicarTodo" class="btn-post" style="background: var(--wa-green); margin-top: 15px; font-size:16px;">🚀 PUBLICAR</button>
             <div id="status-msg" style="margin-top:10px; margin-bottom:0;"></div>
         </div>
@@ -214,7 +264,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, updateDoc, arrayUnion, arrayRemove, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, updateDoc, arrayUnion, arrayRemove, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = { apiKey: "AIzaSyBwBq4gLgv4DSfUidzUuC7Irmvj_4pCTtI", authDomain: "familia-yajure-app.firebaseapp.com", projectId: "familia-yajure-app", storageBucket: "familia-yajure-app.firebasestorage.app", messagingSenderId: "692035727386", appId: "1:692035727386:web:dfa3e39a481d56368a61a3" };
     const app = initializeApp(firebaseConfig);
@@ -245,313 +295,208 @@
     window.abrirLupa = (url) => { document.getElementById('modal-img').src = url; document.getElementById('photo-modal').style.display = 'flex'; };
     window.cerrarLupa = () => { document.getElementById('photo-modal').style.display = 'none'; };
 
+    // ☀️ MODO DÍA/NOCHE
+    window.toggleTheme = () => {
+        document.body.classList.toggle('light-mode');
+        let btn = document.getElementById('theme-toggle');
+        if(document.body.classList.contains('light-mode')) {
+            btn.innerText = '🌙';
+            localStorage.setItem('theme', 'light');
+        } else {
+            btn.innerText = '☀️';
+            localStorage.setItem('theme', 'dark');
+        }
+    };
+    // Cargar tema guardado
+    if(localStorage.getItem('theme') === 'light') { document.body.classList.add('light-mode'); document.getElementById('theme-toggle').innerText = '🌙'; }
+
     // 📸 SELECCIONAR FOTOS
     document.getElementById('fotoInput').onchange = (e) => {
         archivosSeleccionados = e.target.files;
         if(archivosSeleccionados.length > 5) { alert("Máximo 5 fotos."); archivosSeleccionados = []; return; }
-        if(archivosSeleccionados.length > 0) {
-            document.getElementById('labelFoto').innerHTML = `✅ ${archivosSeleccionados.length} FOTO(S)`;
-            document.getElementById('labelFoto').style.background = "#25d366";
-        }
+        if(archivosSeleccionados.length > 0) { document.getElementById('labelFoto').innerHTML = `✅ ${archivosSeleccionados.length} FOTO(S)`; document.getElementById('labelFoto').style.background = "#25d366"; }
     };
 
     // 🎙️ GRABAR AUDIO
     document.getElementById('btnGrabar').onclick = async () => {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            mediaRecorder = new MediaRecorder(stream);
-            mediaRecorder.start();
-            audioChunks = [];
-            
+            mediaRecorder = new MediaRecorder(stream); mediaRecorder.start(); audioChunks = [];
             let segundos = 0; document.getElementById('relojAudio').innerText = "0";
             secInterval = setInterval(() => { segundos++; document.getElementById('relojAudio').innerText = segundos; }, 1000);
-
             recordTimer = setTimeout(() => { if(mediaRecorder.state === "recording") mediaRecorder.stop(); }, 30000);
-
             mediaRecorder.addEventListener("dataavailable", event => { audioChunks.push(event.data); });
-
             mediaRecorder.addEventListener("stop", () => {
                 clearTimeout(recordTimer); clearInterval(secInterval);
                 audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
                 const audioUrl = URL.createObjectURL(audioBlob);
-                document.getElementById('audioPreview').src = audioUrl;
-                document.getElementById('audioPreview').style.display = 'block';
+                document.getElementById('audioPreview').src = audioUrl; document.getElementById('audioPreview').style.display = 'block';
                 document.getElementById('recording-status').style.display = 'none';
-                document.getElementById('btnGrabar').innerText = "✅ AUDIO LISTO";
-                document.getElementById('btnGrabar').style.background = "#25d366";
-                document.getElementById('btnGrabar').style.display = 'block';
-                
-                // 🔥 APARECE EL BOTÓN DE DESCARTAR AUDIO 🔥
+                document.getElementById('btnGrabar').innerText = "✅ AUDIO LISTO"; document.getElementById('btnGrabar').style.background = "#25d366"; document.getElementById('btnGrabar').style.display = 'block';
                 document.getElementById('btnBorrarAudio').style.display = 'block';
             });
-
-            document.getElementById('recording-status').style.display = 'block';
-            document.getElementById('btnGrabar').style.display = 'none';
-            document.getElementById('audioPreview').style.display = 'none';
-            document.getElementById('btnBorrarAudio').style.display = 'none';
-
-        } catch (err) { alert("⚠️ El teléfono necesita permiso para usar el micrófono."); }
+            document.getElementById('recording-status').style.display = 'block'; document.getElementById('btnGrabar').style.display = 'none'; document.getElementById('audioPreview').style.display = 'none'; document.getElementById('btnBorrarAudio').style.display = 'none';
+        } catch (err) { alert("⚠️ Dale permiso al micrófono."); }
     };
-
     document.getElementById('btnStop').onclick = () => { if(mediaRecorder && mediaRecorder.state === "recording") mediaRecorder.stop(); };
-
-    // 🔥 ACCIÓN: DESCARTAR AUDIO 🔥
-    document.getElementById('btnBorrarAudio').onclick = () => {
-        audioBlob = null;
-        audioChunks = [];
-        document.getElementById('audioPreview').src = "";
-        document.getElementById('audioPreview').style.display = 'none';
-        document.getElementById('btnBorrarAudio').style.display = 'none';
-        document.getElementById('btnGrabar').innerText = "🎙️ AUDIO";
-        document.getElementById('btnGrabar').style.background = "#ef4444";
-    };
+    document.getElementById('btnBorrarAudio').onclick = () => { audioBlob = null; audioChunks = []; document.getElementById('audioPreview').src = ""; document.getElementById('audioPreview').style.display = 'none'; document.getElementById('btnBorrarAudio').style.display = 'none'; document.getElementById('btnGrabar').innerText = "🎙️ AUDIO"; document.getElementById('btnGrabar').style.background = "#ef4444"; };
 
     // 🚀 PUBLICAR TODO
     document.getElementById('btnPublicarTodo').onclick = async () => {
         const nombre = getNombre(); if (!nombre) return;
-        
-        if(archivosSeleccionados.length === 0 && !audioBlob) {
-            alert("⚠️ Agrega al menos una foto o graba un audio para publicar."); return;
-        }
-
-        const cat = document.getElementById('categoriaInput').value;
-        const mensaje = prompt(`✍️ Escribe un mensaje (Opcional):`);
-        const status = document.getElementById('status-msg');
-        
-        status.innerHTML = "⏳ Acelerando el motor... no cierres la App.";
-        document.getElementById('btnPublicarTodo').style.display = 'none';
-        
+        if(archivosSeleccionados.length === 0 && !audioBlob) { alert("⚠️ Agrega al menos una foto o graba un audio para publicar."); return; }
+        const cat = document.getElementById('categoriaInput').value; const mensaje = prompt(`✍️ Mensaje (Opcional):`); const status = document.getElementById('status-msg');
+        status.innerHTML = "⏳ Subiendo..."; document.getElementById('btnPublicarTodo').style.display = 'none';
         try {
             let urlsSubidas = [];
             if(archivosSeleccionados.length > 0) {
                 status.innerHTML = "🎨 Comprimiendo y subiendo fotos...";
                 for(let i = 0; i < archivosSeleccionados.length; i++) {
-                    const compressedFile = await compressImage(archivosSeleccionados[i]);
-                    const formData = new FormData();
-                    formData.append("image", compressedFile); 
+                    const compressedFile = await compressImage(archivosSeleccionados[i]); // 🔥 Vuelve la compresión
+                    const formData = new FormData(); formData.append("image", compressedFile); 
                     const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: formData });
-                    const imgData = await res.json();
-                    if (imgData.success) urlsSubidas.push(imgData.data.url);
+                    const imgData = await res.json(); if (imgData.success) urlsSubidas.push(imgData.data.url);
                 }
             }
-
             let base64Audio = null;
-            if(audioBlob) {
-                status.innerHTML = "🎙️ Empaquetando audio...";
-                base64Audio = await new Promise((resolve) => {
-                    const reader = new FileReader();
-                    reader.readAsDataURL(audioBlob);
-                    reader.onloadend = () => resolve(reader.result);
-                });
-            }
-                
-            status.innerHTML = "📝 Guardando en el muro...";
-            await addDoc(collection(db, "mensajes"), {
-                texto: mensaje || "", 
-                fotos: urlsSubidas, 
-                audio: base64Audio, 
-                autor: nombre, 
-                categoria: cat, 
-                fecha: new Date(),
-                likesBy: [],
-                comentarios: []
-            });
+            if(audioBlob) { status.innerHTML = "🎙️ Subiendo audio..."; base64Audio = await new Promise((r) => { const reader = new FileReader(); reader.readAsDataURL(audioBlob); reader.onloadend = () => r(reader.result); }); }
+            status.innerHTML = "📝 Guardando...";
+            await addDoc(collection(db, "mensajes"), { texto: mensaje || "", fotos: urlsSubidas, audio: base64Audio, autor: nombre, categoria: cat, fecha: new Date(), reacciones: {}, comentarios: [] });
+            status.innerHTML = "✅ ¡Listo!";
             
-            status.innerHTML = "✅ ¡Publicación exitosa!";
-            
-            if (cat !== "Historia") {
-                document.getElementById('wa-notice').style.display = "block";
-                document.getElementById('wa-notice').href = `https://wa.me/?text=¡Nuevo+recuerdo+en+${cat}!`;
-            }
+            // 🔥 RECONEXIÓN DE WHATSAPP 🔥
+            if (cat !== "Historia") { document.getElementById('wa-notice').style.display = "block"; document.getElementById('wa-notice').href = `https://wa.me/?text=¡Nuevo+recuerdo+en+${cat}!`; }
 
-            // RESETEAR TODO AL FINALIZAR
-            archivosSeleccionados = [];
-            audioBlob = null;
-            document.getElementById('fotoInput').value = ""; 
-            document.getElementById('labelFoto').innerHTML = "📸 FOTOS";
-            document.getElementById('labelFoto').style.background = "#64748b";
-            document.getElementById('btnGrabar').innerText = "🎙️ AUDIO";
-            document.getElementById('btnGrabar').style.background = "#ef4444";
-            document.getElementById('audioPreview').style.display = 'none';
-            document.getElementById('audioPreview').src = "";
-            document.getElementById('btnBorrarAudio').style.display = 'none';
-            document.getElementById('btnPublicarTodo').style.display = 'block';
-
-        } catch (err) { 
-            status.innerHTML = "❌ Error al subir.";
-            alert("Error: " + err.message);
-            document.getElementById('btnPublicarTodo').style.display = 'block';
-        }
+            archivosSeleccionados = []; audioBlob = null; document.getElementById('fotoInput').value = ""; document.getElementById('labelFoto').innerHTML = "📸 FOTOS"; document.getElementById('labelFoto').style.background = "#64748b"; document.getElementById('btnGrabar').innerText = "🎙️ AUDIO"; document.getElementById('btnGrabar').style.background = "#ef4444"; document.getElementById('audioPreview').style.display = 'none'; document.getElementById('audioPreview').src = ""; document.getElementById('btnBorrarAudio').style.display = 'none'; document.getElementById('btnPublicarTodo').style.display = 'block';
+        } catch (err) { status.innerHTML = "❌ Error."; alert("Error: " + err.message); document.getElementById('btnPublicarTodo').style.display = 'block'; }
     };
 
-    async function compressImage(file) {
-        return new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = (event) => {
-                const img = new Image();
-                img.src = event.target.result;
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    let w = img.width; let h = img.height;
-                    if (w > 1200) { h *= 1200 / w; w = 1200; }
-                    canvas.width = w; canvas.height = h;
-                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                    canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.8);
-                };
-            };
-        });
-    }
+    async function compressImage(file) { return new Promise((resolve) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = (event) => { const img = new Image(); img.src = event.target.result; img.onload = () => { const canvas = document.createElement('canvas'); let w = img.width; let h = img.height; if (w > 1200) { h *= 1200 / w; w = 1200; } canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h); canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.8); }; }; }); }
 
-    // ==========================================
-    // PINTAR MURO Y VITRINA DE HISTORIAS
-    // ==========================================
     const q = query(collection(db, "mensajes"), orderBy("fecha", "desc"));
     onSnapshot(q, (snapshot) => {
-        todosLosPosts = [];
-        historiasActivas = [];
-        
-        const ahora = new Date().getTime();
-        const limite24h = ahora - (24 * 60 * 60 * 1000);
-
+        todosLosPosts = []; historiasActivas = [];
+        const ahora = new Date().getTime(); const limite24h = ahora - (24 * 60 * 60 * 1000);
         snapshot.forEach((doc) => {
             const data = { id: doc.id, ...doc.data() };
             let fechaPost = data.fecha ? (typeof data.fecha.toDate === 'function' ? data.fecha.toDate().getTime() : new Date(data.fecha).getTime()) : 0;
-            if (data.categoria === "Historia") { if (fechaPost > limite24h) historiasActivas.push(data); } 
-            else { todosLosPosts.push(data); }
+            if (data.categoria === "Historia") { if (fechaPost > limite24h) historiasActivas.push(data); } else { todosLosPosts.push(data); }
         });
-        
-        pintarVitrinaHistorias();
-        pintarMuro();
+        pintarVitrinaHistorias(); pintarMuro();
     });
 
     function pintarVitrinaHistorias() {
-        const contenedorDiv = document.getElementById('historias-container');
-        const scrollDiv = document.getElementById('historias-scroll');
-        scrollDiv.innerHTML = "";
-
+        const contenedorDiv = document.getElementById('historias-container'); const scrollDiv = document.getElementById('historias-scroll'); scrollDiv.innerHTML = "";
         if (historiasActivas.length > 0) {
             contenedorDiv.style.display = "block";
             historiasActivas.forEach((historia, index) => {
                 let fotoPortada = (historia.fotos && historia.fotos.length > 0) ? historia.fotos[0] : (historia.foto || "https://img.icons8.com/color/150/microphone.png");
                 let estadoAro = historiasVistas.includes(historia.id) ? "seen" : "unseen";
-                scrollDiv.innerHTML += `
-                    <div class="story-item" onclick="abrirHistoria(${index})">
-                        <div class="story-ring ${estadoAro}"><img src="${fotoPortada}" style="background:white;"></div>
-                        <div class="story-author">${historia.autor}</div>
-                    </div>`;
+                scrollDiv.innerHTML += `<div class="story-item" onclick="abrirHistoria(${index})"><div class="story-ring ${estadoAro}"><img src="${fotoPortada}" style="background:white;"></div><div class="story-author">${historia.autor}</div></div>`;
             });
-        } else {
-            contenedorDiv.style.display = "none";
-        }
+        } else { contenedorDiv.style.display = "none"; }
     }
 
     window.abrirHistoria = (index) => {
-        const historia = historiasActivas[index];
-        const foto = (historia.fotos && historia.fotos.length > 0) ? historia.fotos[0] : (historia.foto || "");
-        
+        const historia = historiasActivas[index]; const foto = (historia.fotos && historia.fotos.length > 0) ? historia.fotos[0] : (historia.foto || "");
         if(!historiasVistas.includes(historia.id)) { historiasVistas.push(historia.id); localStorage.setItem('historias_vistas', JSON.stringify(historiasVistas)); pintarVitrinaHistorias(); }
-        
-        document.getElementById('sv-author').innerText = historia.autor;
-        document.getElementById('sv-img').src = foto;
-        document.getElementById('sv-text').innerText = historia.texto || "";
-        
-        const audioStory = document.getElementById('sv-audio');
-        if(historia.audio) { audioStory.src = historia.audio; audioStory.style.display = 'block'; } 
-        else { audioStory.src = ""; audioStory.style.display = 'none'; }
-
-        document.getElementById('story-viewer').style.display = 'flex';
-        
-        clearTimeout(timerCierreHistoria);
-        let barra = document.getElementById('sv-progress');
-        barra.style.transition = 'none'; barra.style.width = '0%';
-        
-        let tiempoHistoria = historia.audio ? 35000 : 10000;
-        
-        setTimeout(() => { barra.style.transition = `width ${tiempoHistoria/1000}s linear`; barra.style.width = '100%'; }, 50);
-        timerCierreHistoria = setTimeout(() => { cerrarHistoria(); }, tiempoHistoria);
+        document.getElementById('sv-author').innerText = historia.autor; document.getElementById('sv-img').src = foto; document.getElementById('sv-text').innerText = historia.texto || "";
+        const audioStory = document.getElementById('sv-audio'); if(historia.audio) { audioStory.src = historia.audio; audioStory.style.display = 'block'; } else { audioStory.src = ""; audioStory.style.display = 'none'; }
+        document.getElementById('story-viewer').style.display = 'flex'; clearTimeout(timerCierreHistoria); let barra = document.getElementById('sv-progress'); barra.style.transition = 'none'; barra.style.width = '0%';
+        let tiempoHistoria = historia.audio ? 35000 : 10000; setTimeout(() => { barra.style.transition = `width ${tiempoHistoria/1000}s linear`; barra.style.width = '100%'; }, 50); timerCierreHistoria = setTimeout(() => { cerrarHistoria(); }, tiempoHistoria);
     };
-
-    window.cerrarHistoria = () => { 
-        clearTimeout(timerCierreHistoria); 
-        document.getElementById('story-viewer').style.display = 'none'; 
-        document.getElementById('sv-img').src = ""; 
-        const audioStory = document.getElementById('sv-audio');
-        audioStory.pause(); audioStory.src = "";
-    };
+    window.cerrarHistoria = () => { clearTimeout(timerCierreHistoria); document.getElementById('story-viewer').style.display = 'none'; document.getElementById('sv-img').src = ""; const audioStory = document.getElementById('sv-audio'); audioStory.pause(); audioStory.src = ""; };
 
     window.filtrar = (cat) => { filtroActual = cat; document.querySelectorAll('.filter-btn').forEach(btn => { btn.classList.remove('active'); if(btn.innerText.includes(cat) || (cat === 'Todo' && btn.innerText === 'Todo')) btn.classList.add('active'); }); pintarMuro(); };
 
-    function pintarMuro() {
-        const muro = document.getElementById('muro');
-        muro.innerHTML = "";
-        const esAdmin = localStorage.getItem('familia_auth') === "ticoadmin2026";
+    // 🔥 BUSCADOR
+    document.getElementById('searchInput').addEventListener('input', (e) => { const textoBusqueda = e.target.value.toLowerCase(); pintarMuro(textoBusqueda); });
+
+    function pintarMuro(busqueda = "") {
+        const muro = document.getElementById('muro'); muro.innerHTML = "";
+        const esAdmin = localStorage.getItem('familia_auth') === "ticoadmin2026"; // 🔥 ADMIN CHECK RECONECTADO
         const miNombre = localStorage.getItem('user_n'); 
         let ultimoMes = "";
-        const postsAmostrar = todosLosPosts.filter(p => filtroActual === 'Todo' || p.categoria === filtroActual);
+        
+        const postsAmostrar = todosLosPosts.filter(p => {
+            const cumpleCategoria = (filtroActual === 'Todo' || p.categoria === filtroActual);
+            const cumpleBusqueda = (p.texto || "").toLowerCase().includes(busqueda) || (p.autor || "").toLowerCase().includes(busqueda) || (p.categoria || "").toLowerCase().includes(busqueda);
+            return cumpleCategoria && cumpleBusqueda;
+        });
 
-        if(postsAmostrar.length === 0) { muro.innerHTML = `<div style="text-align:center; padding:30px; color:#94a3b8;">No hay nada que mostrar aquí... 📸</div>`; return; }
+        if(postsAmostrar.length === 0) { 
+            if(busqueda) muro.innerHTML = `<div style="text-align:center; padding:30px; color:#94a3b8;">No encontré nada con "${busqueda}" 🕵️‍♂️</div>`;
+            else muro.innerHTML = `<div style="text-align:center; padding:30px; color:#94a3b8;">No hay nada que mostrar aquí... 📸</div>`; 
+            return; 
+        }
 
         postsAmostrar.forEach((data) => {
             const fechaObj = data.fecha ? (typeof data.fecha.toDate === 'function' ? data.fecha.toDate() : new Date(data.fecha)) : new Date();
             const mesActual = fechaObj.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
             const fechaCorta = fechaObj.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
             const catLabel = data.categoria || "Familia"; 
-            const listaLikes = data.likesBy || [];
-            const yaDiLike = listaLikes.includes(miNombre); 
-            const totalVisual = listaLikes.length;
-            const textoLike = yaDiLike ? `❤️ Te gusta (${totalVisual})` : `🤍 Me gusta (${totalVisual})`;
 
             if (mesActual !== ultimoMes) { muro.innerHTML += `<div class="month-separator">${mesActual}</div>`; ultimoMes = mesActual; }
 
-            let imagenesArray = data.fotos || []; 
-            if(imagenesArray.length === 0 && data.foto) imagenesArray = [data.foto]; 
-            let carouselHtml = imagenesArray.length > 0 ? `<div class="post-carousel">` + imagenesArray.map(url => `<img src="${url}" onclick="window.abrirLupa('${url}')">`).join('') + `</div>` : "";
+            // ✅ FOTOS VIEJAS FIX
+            let imagenesArray = data.fotos || []; if(imagenesArray.length === 0 && data.foto) imagenesArray = [data.foto]; 
             
+            let carouselHtml = imagenesArray.length > 0 ? `<div class="post-carousel">` + imagenesArray.map(url => `<img src="${url}" onclick="window.abrirLupa('${url}')">`).join('') + `</div>` : "";
             let audioHtml = data.audio ? `<audio controls src="${data.audio}" style="width:100%; margin-top:10px; margin-bottom: 10px; border-radius: 10px;"></audio>` : "";
-
             let comentariosHtml = data.comentarios ? data.comentarios.map(c => `<div class="comment"><b>${c.autor}:</b> ${c.texto}</div>`).join('') : "";
+
+            let reacciones = data.reacciones || {}; 
+            if(Object.keys(reacciones).length === 0 && data.likesBy && data.likesBy.length > 0) { data.likesBy.forEach(u => reacciones[u] = "👍"); }
+            let miReaccion = reacciones[miNombre];
+            let botonReaccionLabel = miReaccion ? `${miReaccion} TÚ` : `😊 Reaccionar`;
+            let estiloBoton = miReaccion ? "background:#e0f2fe; color:#0284c7; border-color:#0284c7;" : "";
+
+            let conteo = {}; Object.values(reacciones).forEach(r => { conteo[r] = (conteo[r] || 0) + 1; });
+            let textoReacciones = ""; let totalReacciones = 0;
+            for (const [emoji, num] of Object.entries(conteo)) { textoReacciones += `<span class="mini-reaction-icon">${emoji}</span> `; totalReacciones += num; }
+            if (totalReacciones > 0) textoReacciones += ` (${totalReacciones})`;
+            let nombres = Object.keys(reacciones).slice(0, 3).join(", ");
+            if(Object.keys(reacciones).length > 3) nombres += ` y ${Object.keys(reacciones).length - 3} más`;
+            if(totalReacciones > 0 && nombres) textoReacciones += ` · ${nombres}`;
 
             muro.innerHTML += `
                 <div class="post">
                     <div class="post-header">
                         <span class="post-author">👤 ${data.autor} <span class="category-badge">${catLabel}</span></span>
-                        <div>
-                            <span class="post-date">${fechaCorta}</span>
-                            ${esAdmin ? `<button class="btn-delete-admin" onclick="window.borrarPost('${data.id}')">🗑️</button>` : ""}
-                        </div>
+                        <div><span class="post-date">${fechaCorta}</span>${esAdmin ? `<button class="btn-delete-admin" onclick="window.borrarPost('${data.id}')">🗑️</button>` : ""}</div>
                     </div>
                     <p style="font-weight: 600;">${data.texto}</p>
-                    
-                    ${audioHtml} 
-                    ${carouselHtml} 
-                    ${imagenesArray.length > 1 ? `<div class="swipe-indicator">👉 Desliza para ver más (${imagenesArray.length} fotos)</div>` : ""}
-
-                    <button class="btn-like ${yaDiLike ? 'liked' : ''}" onclick="darLike('${data.id}')">${textoLike}</button>
-                    <div class="likes-list">${listaLikes.length > 0 ? `Le gusta a: <b>${listaLikes.join(", ")}</b>` : ""}</div>
-                    <div class="comments-section">${comentariosHtml}
-                        <div class="comment-input-group">
-                            <input type="text" id="input-${data.id}" class="comment-input" placeholder="Opinar...">
-                            <button class="btn-send-comment" onclick="enviarComentario('${data.id}')">Publicar</button>
+                    ${audioHtml} ${carouselHtml} ${imagenesArray.length > 1 ? `<div class="swipe-indicator">👉 Desliza para ver más (${imagenesArray.length} fotos)</div>` : ""}
+                    <div class="reaction-wrapper">
+                        <button class="btn-reaction-trigger" onclick="toggleDock('${data.id}')" style="${estiloBoton}">${botonReaccionLabel}</button>
+                        <div id="dock-${data.id}" class="reaction-dock">
+                            <span class="reaction-option" onclick="enviarReaccion('${data.id}', '👍')">👍</span>
+                            <span class="reaction-option" onclick="enviarReaccion('${data.id}', '❤️')">❤️</span>
+                            <span class="reaction-option" onclick="enviarReaccion('${data.id}', '😂')">😂</span>
+                            <span class="reaction-option" onclick="enviarReaccion('${data.id}', '😮')">😮</span>
+                            <span class="reaction-option" onclick="enviarReaccion('${data.id}', '😢')">😢</span>
+                            <span class="reaction-option" onclick="enviarReaccion('${data.id}', '🍻')">🍻</span>
                         </div>
+                    </div>
+                    <div class="reactions-display">${textoReacciones}</div>
+                    <div class="comments-section" style="margin-top:10px;">${comentariosHtml}
+                        <div class="comment-input-group"><input type="text" id="input-${data.id}" class="comment-input" placeholder="Opinar..."><button class="btn-send-comment" onclick="enviarComentario('${data.id}')">Publicar</button></div>
                     </div>
                 </div>`;
         });
     }
 
-    window.darLike = async (id) => { const nombre = getNombre(); if(!nombre) return; const docRef = doc(db, "mensajes", id); const docSnap = await getDoc(docRef); if (docSnap.exists()) { const data = docSnap.data(); const lista = data.likesBy || []; if (lista.includes(nombre)) { await updateDoc(docRef, { likesBy: arrayRemove(nombre) }); } else { await updateDoc(docRef, { likesBy: arrayUnion(nombre) }); } } };
+    window.toggleDock = (id) => { let dock = document.getElementById(`dock-${id}`); let display = dock.style.display; document.querySelectorAll('.reaction-dock').forEach(d => d.style.display = 'none'); dock.style.display = (display === 'flex') ? 'none' : 'flex'; };
+    window.enviarReaccion = async (id, emoji) => {
+        const nombre = getNombre(); if(!nombre) return;
+        document.getElementById(`dock-${id}`).style.display = 'none'; 
+        const docRef = doc(db, "mensajes", id); const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) { const data = docSnap.data(); let reacciones = data.reacciones || {}; if (reacciones[nombre] === emoji) { delete reacciones[nombre]; } else { reacciones[nombre] = emoji; } await updateDoc(docRef, { reacciones: reacciones }); }
+    };
     window.enviarComentario = async (id) => { const input = document.getElementById(`input-${id}`); const nombre = getNombre(); if (!input.value || !nombre) return; await updateDoc(doc(db, "mensajes", id), { comentarios: arrayUnion({ autor: nombre, texto: input.value }) }); input.value = ""; };
     window.borrarPost = async (id) => { if(confirm("¿Borrar este recuerdo?")) await deleteDoc(doc(db, "mensajes", id)); };
 
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() {
-            navigator.serviceWorker.register('sw.js').then(function(registration) {
-                console.log('Vigilante contratado con éxito');
-            }, function(err) {
-                console.log('Falló el contrato del vigilante:', err);
-            });
-        });
-    }
+    if ('serviceWorker' in navigator) { window.addEventListener('load', function() { navigator.serviceWorker.register('sw.js').then(function(registration) { console.log('Vigilante contratado con éxito'); }, function(err) { console.log('Falló el contrato del vigilante:', err); }); }); }
 </script>
 
 </body>
