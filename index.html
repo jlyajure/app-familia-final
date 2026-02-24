@@ -35,7 +35,6 @@
             --input-bg: rgba(255,255,255,0.1);
             --header-bg: rgba(15, 23, 42, 0.95);
             --btn-text: white;
-            --filter-active: white;
         }
 
         /* MODO DÍA */
@@ -47,7 +46,6 @@
             --input-bg: rgba(0,0,0,0.05);
             --header-bg: rgba(255, 255, 255, 0.95);
             --btn-text: #0f172a;
-            --filter-active: white;
         }
 
         body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; min-height: 100vh; background: var(--bg-body); background-attachment: fixed; color: var(--text-main); overflow-x: hidden; -webkit-tap-highlight-color: transparent; transition: background 0.5s; }
@@ -63,7 +61,6 @@
         
         header { background: var(--header-bg); padding: 20px; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); transition: background 0.3s; }
         
-        /* BOTÓN DE MODO NOCHE/DÍA */
         #theme-toggle { background: none; border: 1px solid rgba(148, 163, 184, 0.5); color: var(--text-main); font-size: 20px; padding: 5px 10px; border-radius: 50%; cursor: pointer; margin-right: 10px; transition: 0.3s; }
 
         .container { max-width: 480px; margin: auto; padding: 20px 15px; }
@@ -307,7 +304,6 @@
             localStorage.setItem('theme', 'dark');
         }
     };
-    // Cargar tema guardado
     if(localStorage.getItem('theme') === 'light') { document.body.classList.add('light-mode'); document.getElementById('theme-toggle').innerText = '🌙'; }
 
     // 📸 SELECCIONAR FOTOS
@@ -352,7 +348,7 @@
             if(archivosSeleccionados.length > 0) {
                 status.innerHTML = "🎨 Comprimiendo y subiendo fotos...";
                 for(let i = 0; i < archivosSeleccionados.length; i++) {
-                    const compressedFile = await compressImage(archivosSeleccionados[i]); // 🔥 Vuelve la compresión
+                    const compressedFile = await compressImage(archivosSeleccionados[i]);
                     const formData = new FormData(); formData.append("image", compressedFile); 
                     const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: formData });
                     const imgData = await res.json(); if (imgData.success) urlsSubidas.push(imgData.data.url);
@@ -364,7 +360,7 @@
             await addDoc(collection(db, "mensajes"), { texto: mensaje || "", fotos: urlsSubidas, audio: base64Audio, autor: nombre, categoria: cat, fecha: new Date(), reacciones: {}, comentarios: [] });
             status.innerHTML = "✅ ¡Listo!";
             
-            // 🔥 RECONEXIÓN DE WHATSAPP 🔥
+            // 🔥 WHATSAPP 🔥
             if (cat !== "Historia") { document.getElementById('wa-notice').style.display = "block"; document.getElementById('wa-notice').href = `https://wa.me/?text=¡Nuevo+recuerdo+en+${cat}!`; }
 
             archivosSeleccionados = []; audioBlob = null; document.getElementById('fotoInput').value = ""; document.getElementById('labelFoto').innerHTML = "📸 FOTOS"; document.getElementById('labelFoto').style.background = "#64748b"; document.getElementById('btnGrabar').innerText = "🎙️ AUDIO"; document.getElementById('btnGrabar').style.background = "#ef4444"; document.getElementById('audioPreview').style.display = 'none'; document.getElementById('audioPreview').src = ""; document.getElementById('btnBorrarAudio').style.display = 'none'; document.getElementById('btnPublicarTodo').style.display = 'block';
@@ -414,8 +410,7 @@
 
     function pintarMuro(busqueda = "") {
         const muro = document.getElementById('muro'); muro.innerHTML = "";
-        const esAdmin = localStorage.getItem('familia_auth') === "ticoadmin2026"; // 🔥 ADMIN CHECK RECONECTADO
-        const miNombre = localStorage.getItem('user_n'); 
+        const esAdmin = localStorage.getItem('familia_auth') === "ticoadmin2026"; const miNombre = localStorage.getItem('user_n'); 
         let ultimoMes = "";
         
         const postsAmostrar = todosLosPosts.filter(p => {
