@@ -267,7 +267,8 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const CLAVE_NORMAL = "familia2026"; const CLAVE_ADMIN = "ticoadmin2026";
+    const CLAVE_NORMAL = "familia2026"; 
+    const CLAVE_ADMIN = "ticoadmin2026";
     const IMGBB_KEY = "07dd4f0a1180673510c5047ae8b5eec8"; 
 
     let todosLosPosts = [];
@@ -360,7 +361,6 @@
             await addDoc(collection(db, "mensajes"), { texto: mensaje || "", fotos: urlsSubidas, audio: base64Audio, autor: nombre, categoria: cat, fecha: new Date(), reacciones: {}, comentarios: [] });
             status.innerHTML = "✅ ¡Listo!";
             
-            // 🔥 WHATSAPP 🔥
             if (cat !== "Historia") { document.getElementById('wa-notice').style.display = "block"; document.getElementById('wa-notice').href = `https://wa.me/?text=¡Nuevo+recuerdo+en+${cat}!`; }
 
             archivosSeleccionados = []; audioBlob = null; document.getElementById('fotoInput').value = ""; document.getElementById('labelFoto').innerHTML = "📸 FOTOS"; document.getElementById('labelFoto').style.background = "#64748b"; document.getElementById('btnGrabar').innerText = "🎙️ AUDIO"; document.getElementById('btnGrabar').style.background = "#ef4444"; document.getElementById('audioPreview').style.display = 'none'; document.getElementById('audioPreview').src = ""; document.getElementById('btnBorrarAudio').style.display = 'none'; document.getElementById('btnPublicarTodo').style.display = 'block';
@@ -405,12 +405,13 @@
 
     window.filtrar = (cat) => { filtroActual = cat; document.querySelectorAll('.filter-btn').forEach(btn => { btn.classList.remove('active'); if(btn.innerText.includes(cat) || (cat === 'Todo' && btn.innerText === 'Todo')) btn.classList.add('active'); }); pintarMuro(); };
 
-    // 🔥 BUSCADOR
+    // 🔥 BUSCADOR (CON BÚSQUEDA DE TEXTO)
     document.getElementById('searchInput').addEventListener('input', (e) => { const textoBusqueda = e.target.value.toLowerCase(); pintarMuro(textoBusqueda); });
 
     function pintarMuro(busqueda = "") {
         const muro = document.getElementById('muro'); muro.innerHTML = "";
-        const esAdmin = localStorage.getItem('familia_auth') === "ticoadmin2026"; const miNombre = localStorage.getItem('user_n'); 
+        const esAdmin = localStorage.getItem('familia_auth') === "ticoadmin2026"; // 🔥 ADMIN CHECK OFICIAL
+        const miNombre = localStorage.getItem('user_n'); 
         let ultimoMes = "";
         
         const postsAmostrar = todosLosPosts.filter(p => {
