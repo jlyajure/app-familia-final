@@ -23,9 +23,13 @@
 
         #gallery-view { padding-top: 90px; padding-bottom: 50px; padding-left: 10px; padding-right: 10px; }
         
+        /* SISTEMA DE MENSAJES DE ESTADO (Para que no se vea negro) */
+        #status-msg { text-align: center; margin-top: 50px; padding: 20px; font-size: 14px; color: #888; }
+        .error-txt { color: #ff4444; font-weight: bold; border: 1px solid #ff4444; padding: 10px; border-radius: 10px; background: rgba(255,0,0,0.1); }
+
         .masonry { column-count: 2; column-gap: 10px; }
         .photo-card { break-inside: avoid; margin-bottom: 10px; background: var(--card); border-radius: 15px; overflow: hidden; position: relative; border: 1px solid #333; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        .photo-img { width: 100%; display: block; border-bottom: 1px solid #333; }
+        .photo-img { width: 100%; display: block; border-bottom: 1px solid #333; min-height: 100px; background: #222; }
         .photo-info { padding: 10px; }
         .photo-title { font-size: 14px; font-weight: 700; color: white; margin-bottom: 4px; }
         .photo-desc { font-size: 12px; color: #aaa; line-height: 1.4; }
@@ -76,9 +80,8 @@
 </div>
 
 <div id="gallery-view">
-    <div id="photos-container" class="masonry">
-        <p style="color:#666; text-align:center; width:100%;">Cargando recuerdos...</p>
-    </div>
+    <div id="status-msg">🔄 Cargando App...</div>
+    <div id="photos-container" class="masonry"></div>
 </div>
 
 <div id="full-view" onclick="this.style.display='none'">
@@ -90,101 +93,126 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+    // 🔴 1. CONFIGURACIÓN (SI ESTO FALLA, SALE MENSAJE)
     const firebaseConfig = { apiKey: "AIzaSyBwBq4gLgv4DSfUidzUuC7Irmvj_4pCTtI", authDomain: "familia-yajure-app.firebaseapp.com", projectId: "familia-yajure-app", storageBucket: "familia-yajure-app.firebasestorage.app", messagingSenderId: "692035727386", appId: "1:692035727386:web:dfa3e39a481d56368a61a3" };
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const IMGBB_KEY = "07dd4f0a1180673510c5047ae8b5eec8";
+    
+    // 🔴 2. NOMBRE DE LA COLECCIÓN (INTENTA 'familia')
+    const COLLECTION_NAME = "familia"; 
 
-    // 🔥 APUNTANDO A LA GAVETA CLÁSICA: "fotos"
-    const COLLECTION_NAME = "fotos"; 
-
-    let adminClicks = 0; let adminTimer;
-    window.triggerAdmin = () => {
-        adminClicks++; clearTimeout(adminTimer); adminTimer = setTimeout(() => { adminClicks = 0; }, 1000);
-        if (adminClicks === 3) {
-            const pass = prompt("🔐 CLAVE:");
-            if (pass === "ticoadmin2026") { 
-                document.body.classList.add('admin-mode'); 
-                document.getElementById('admin-panel').style.display = 'block'; 
-            } else { alert("❌ Error"); }
-            adminClicks = 0;
-        }
-    };
-
-    window.subirFoto = async () => {
-        const tit = document.getElementById('up-titulo').value;
-        const desc = document.getElementById('up-desc').value;
-        const fecha = document.getElementById('up-fecha').value;
-        const file = document.getElementById('up-file').files[0];
-        const status = document.getElementById('upload-status');
-
-        if(!file) { alert("Falta foto"); return; }
+    try {
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const IMGBB_KEY = "07dd4f0a1180673510c5047ae8b5eec8";
         
-        status.innerHTML = "⏳ Subiendo...";
-        try {
-            const compressedImg = await compressImage(file);
-            const formData = new FormData(); formData.append("image", compressedImg);
-            const resImg = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: formData });
-            const dataImg = await resImg.json(); const urlImg = dataImg.data.url;
+        document.getElementById('status-msg').innerText = "📡 Conectado a Firebase. Buscando fotos...";
 
-            await addDoc(collection(db, COLLECTION_NAME), {
-                titulo: tit || "", descripcion: desc || "", fechaRecuerdo: fecha || "", imagenUrl: urlImg, timestamp: new Date()
+        // 🟢 LECTURA DE FOTOS
+        onSnapshot(collection(db, COLLECTION_NAME), (snap) => {
+            const container = document.getElementById('photos-container');
+            const statusMsg = document.getElementById('status-msg');
+            
+            if(snap.empty) { 
+                statusMsg.innerHTML = "⚠️ La carpeta <b>'" + COLLECTION_NAME + "'</b> está vacía.<br>Prueba subir una foto nueva."; 
+                container.innerHTML = "";
+                return; 
+            }
+            
+            statusMsg.style.display = 'none'; // Ocultar mensaje de carga
+            container.innerHTML = "";
+            let fotos = [];
+            snap.forEach(doc => fotos.push({id: doc.id, ...doc.data()}));
+            
+            // 🟢 ORDENAMIENTO SEGURO (COMPATIBLE CON CELULARES VIEJOS)
+            fotos.sort(function(a, b) {
+                var tA = (a.timestamp && a.timestamp.seconds) ? a.timestamp.seconds : 0;
+                var tB = (b.timestamp && b.timestamp.seconds) ? b.timestamp.seconds : 0;
+                return tB - tA;
             });
 
-            status.innerHTML = "✅ LISTO";
-            document.getElementById('up-titulo').value = "";
-            document.getElementById('up-desc').value = "";
-            document.getElementById('up-file').value = "";
-            setTimeout(() => { status.innerHTML = ""; }, 2000);
-        } catch (e) { status.innerHTML = "❌ Error: " + e.message; }
-    };
-
-    window.editarFoto = async (id, oldTit, oldDesc) => {
-        const newTit = prompt("Título:", oldTit);
-        const newDesc = prompt("Descripción:", oldDesc);
-        if (newTit !== null && newDesc !== null) {
-            try { await updateDoc(doc(db, COLLECTION_NAME, id), { titulo: newTit, descripcion: newDesc }); alert("✅ Editado"); } 
-            catch (e) { alert("Error: " + e.message); }
-        }
-    };
-
-    window.borrarFoto = async (id) => {
-        if(confirm("¿Borrar?")) { try { await deleteDoc(doc(db, COLLECTION_NAME, id)); } catch(e) { alert("Error: " + e.message); } }
-    };
-
-    async function compressImage(file) { return new Promise((resolve) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = (event) => { const img = new Image(); img.src = event.target.result; img.onload = () => { const canvas = document.createElement('canvas'); let w = img.width; let h = img.height; if (w > 1000) { h *= 1000 / w; w = 1000; } canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h); canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.85); }; }; }); }
-
-    window.verGrande = (url) => { document.getElementById('full-img').src = url; document.getElementById('full-view').style.display = 'flex'; };
-
-    onSnapshot(collection(db, COLLECTION_NAME), (snap) => {
-        const container = document.getElementById('photos-container');
-        if(snap.empty) { container.innerHTML = "<p style='color:white;text-align:center;'>Álbum vacío o carpeta incorrecta.</p>"; return; }
-        
-        container.innerHTML = "";
-        let fotos = [];
-        snap.forEach(doc => fotos.push({id: doc.id, ...doc.data()}));
-        
-        // Ordenamos por fecha si existe, si no, al final
-        fotos.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
-
-        fotos.forEach(d => {
-            const div = document.createElement('div');
-            div.className = "photo-card";
-            div.innerHTML = `
-                <div class="admin-controls">
-                    <button class="btn-mini btn-edit" onclick="window.editarFoto('${d.id}', '${d.titulo || ''}', '${d.descripcion || ''}')">✏️</button>
-                    <button class="btn-mini btn-del" onclick="window.borrarFoto('${d.id}')">🗑️</button>
-                </div>
-                <img src="${d.imagenUrl}" class="photo-img" onclick="window.verGrande('${d.imagenUrl}')" loading="lazy">
-                <div class="photo-info">
-                    <div class="photo-title">${d.titulo || ''}</div>
-                    <div class="photo-desc">${d.descripcion || ''}</div>
-                    <div class="photo-date">${d.fechaRecuerdo ? '📅 ' + d.fechaRecuerdo : ''}</div>
-                </div>
-            `;
-            container.appendChild(div);
+            fotos.forEach(d => {
+                const div = document.createElement('div');
+                div.className = "photo-card";
+                div.innerHTML = `
+                    <div class="admin-controls">
+                        <button class="btn-mini btn-edit" onclick="window.editarFoto('${d.id}', '${d.titulo || ''}', '${d.descripcion || ''}')">✏️</button>
+                        <button class="btn-mini btn-del" onclick="window.borrarFoto('${d.id}')">🗑️</button>
+                    </div>
+                    <img src="${d.imagenUrl}" class="photo-img" onclick="window.verGrande('${d.imagenUrl}')" loading="lazy">
+                    <div class="photo-info">
+                        <div class="photo-title">${d.titulo || ''}</div>
+                        <div class="photo-desc">${d.descripcion || ''}</div>
+                        <div class="photo-date">${d.fechaRecuerdo ? '📅 ' + d.fechaRecuerdo : ''}</div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }, (error) => {
+            document.getElementById('status-msg').innerHTML = "<div class='error-txt'>❌ ERROR DE LECTURA:<br>" + error.message + "</div>";
         });
-    });
+
+        // --- FUNCIONES DEL SISTEMA ---
+
+        let adminClicks = 0; let adminTimer;
+        window.triggerAdmin = () => {
+            adminClicks++; clearTimeout(adminTimer); adminTimer = setTimeout(() => { adminClicks = 0; }, 1000);
+            if (adminClicks === 3) {
+                const pass = prompt("🔐 CLAVE:");
+                if (pass === "ticoadmin2026") { 
+                    document.body.classList.add('admin-mode'); 
+                    document.getElementById('admin-panel').style.display = 'block'; 
+                } else { alert("❌ Error"); }
+                adminClicks = 0;
+            }
+        };
+
+        window.subirFoto = async () => {
+            const tit = document.getElementById('up-titulo').value;
+            const desc = document.getElementById('up-desc').value;
+            const fecha = document.getElementById('up-fecha').value;
+            const file = document.getElementById('up-file').files[0];
+            const status = document.getElementById('upload-status');
+
+            if(!file) { alert("Falta foto"); return; }
+            status.innerHTML = "⏳ Subiendo...";
+            
+            try {
+                const compressedImg = await compressImage(file);
+                const formData = new FormData(); formData.append("image", compressedImg);
+                const resImg = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: formData });
+                const dataImg = await resImg.json(); const urlImg = dataImg.data.url;
+
+                await addDoc(collection(db, COLLECTION_NAME), {
+                    titulo: tit || "", descripcion: desc || "", fechaRecuerdo: fecha || "", imagenUrl: urlImg, timestamp: new Date()
+                });
+
+                status.innerHTML = "✅ LISTO";
+                document.getElementById('up-titulo').value = "";
+                document.getElementById('up-desc').value = "";
+                document.getElementById('up-file').value = "";
+                setTimeout(() => { status.innerHTML = ""; }, 2000);
+            } catch (e) { status.innerHTML = "❌ Error: " + e.message; }
+        };
+
+        window.editarFoto = async (id, oldTit, oldDesc) => {
+            const newTit = prompt("Título:", oldTit);
+            const newDesc = prompt("Descripción:", oldDesc);
+            if (newTit !== null && newDesc !== null) {
+                try { await updateDoc(doc(db, COLLECTION_NAME, id), { titulo: newTit, descripcion: newDesc }); alert("✅ Editado"); } 
+                catch (e) { alert("Error: " + e.message); }
+            }
+        };
+
+        window.borrarFoto = async (id) => {
+            if(confirm("¿Borrar?")) { try { await deleteDoc(doc(db, COLLECTION_NAME, id)); } catch(e) { alert("Error: " + e.message); } }
+        };
+
+        async function compressImage(file) { return new Promise((resolve) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = (event) => { const img = new Image(); img.src = event.target.result; img.onload = () => { const canvas = document.createElement('canvas'); let w = img.width; let h = img.height; if (w > 1000) { h *= 1000 / w; w = 1000; } canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h); canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.85); }; }; }); }
+
+        window.verGrande = (url) => { document.getElementById('full-img').src = url; document.getElementById('full-view').style.display = 'flex'; };
+
+    } catch (e) {
+        document.getElementById('status-msg').innerHTML = "<div class='error-txt'>💀 ERROR CRÍTICO JS:<br>" + e.message + "</div>";
+    }
 </script>
 </body>
 </html>
