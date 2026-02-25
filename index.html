@@ -135,32 +135,37 @@
             const dataImg = await resImg.json(); const urlImg = dataImg.data.url;
 
             status.innerHTML = "📝 Guardando en el álbum...";
-            await addDoc(collection(db, "familia_fotos"), {
+            
+            // 🔥 AQUÍ CONECTAMOS CON LA GAVETA VIEJA: "familia"
+            await addDoc(collection(db, "familia"), {
                 titulo: tit || "Sin título",
                 descripcion: desc || "",
-                fechaRecuerdo: fecha || new Date().toISOString().split('T')[0],
+                fechaRecuerdo: fecha || "",
                 imagenUrl: urlImg,
                 timestamp: new Date()
             });
 
             status.innerHTML = "✅ ¡FOTO GUARDADA!";
+            
             // Limpieza automática
             document.getElementById('up-titulo').value = "";
             document.getElementById('up-desc').value = "";
             document.getElementById('up-file').value = "";
+            document.getElementById('up-fecha').value = "";
             setTimeout(() => { status.innerHTML = ""; }, 2000);
 
         } catch (e) { status.innerHTML = "❌ Error: " + e.message; }
     };
 
-    // ✏️ EDITAR FOTO (NUEVO)
+    // ✏️ EDITAR FOTO
     window.editarFoto = async (id, oldTit, oldDesc) => {
         const newTit = prompt("Editar Título:", oldTit);
         const newDesc = prompt("Editar Descripción:", oldDesc);
         
         if (newTit !== null && newDesc !== null) {
             try {
-                await updateDoc(doc(db, "familia_fotos", id), {
+                // 🔥 CONECTADO A LA GAVETA "familia"
+                await updateDoc(doc(db, "familia", id), {
                     titulo: newTit,
                     descripcion: newDesc
                 });
@@ -172,40 +177,44 @@
     // 🗑️ BORRAR FOTO
     window.borrarFoto = async (id) => {
         if(confirm("¿Seguro que quieres borrar este recuerdo? No se puede recuperar.")) {
-            try { await deleteDoc(doc(db, "familia_fotos", id)); } catch(e) { alert("Error: " + e.message); }
+            // 🔥 CONECTADO A LA GAVETA "familia"
+            try { await deleteDoc(doc(db, "familia", id)); } catch(e) { alert("Error: " + e.message); }
         }
     };
 
-    // 🖼️ COMPRESOR DE IMAGEN
     async function compressImage(file) { return new Promise((resolve) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = (event) => { const img = new Image(); img.src = event.target.result; img.onload = () => { const canvas = document.createElement('canvas'); let w = img.width; let h = img.height; if (w > 1000) { h *= 1000 / w; w = 1000; } canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h); canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.85); }; }; }); }
 
-    // 👀 VER FOTO GRANDE
     window.verGrande = (url) => {
         document.getElementById('full-img').src = url;
         document.getElementById('full-view').style.display = 'flex';
     };
 
-    // 🔥 LEER ÁLBUM
-    onSnapshot(query(collection(db, "familia_fotos"), orderBy("timestamp", "desc")), (snap) => {
+    // 🔥 LEER ÁLBUM (MODIFICADO PARA MOSTRAR TODO)
+    // Se quitó el ordenamiento por fecha para que las fotos viejas (sin fecha) aparezcan
+    onSnapshot(collection(db, "familia"), (snap) => {
         const container = document.getElementById('photos-container');
         if(snap.empty) { container.innerHTML = "<p style='color:white;text-align:center;'>No hay fotos aún.</p>"; return; }
         
         container.innerHTML = "";
-        snap.forEach(doc => {
-            const d = doc.data();
-            const id = doc.id;
+        
+        // Convertimos a array para poder invertirlo si queremos (opcional)
+        let fotos = [];
+        snap.forEach(doc => fotos.push({id: doc.id, ...doc.data()}));
+        
+        // Las mostramos tal cual llegan
+        fotos.forEach(d => {
             const div = document.createElement('div');
             div.className = "photo-card";
             div.innerHTML = `
                 <div class="admin-controls">
-                    <button class="btn-mini btn-edit" onclick="window.editarFoto('${id}', '${d.titulo || ''}', '${d.descripcion || ''}')">✏️</button>
-                    <button class="btn-mini btn-del" onclick="window.borrarFoto('${id}')">🗑️</button>
+                    <button class="btn-mini btn-edit" onclick="window.editarFoto('${d.id}', '${d.titulo || ''}', '${d.descripcion || ''}')">✏️</button>
+                    <button class="btn-mini btn-del" onclick="window.borrarFoto('${d.id}')">🗑️</button>
                 </div>
                 <img src="${d.imagenUrl}" class="photo-img" onclick="window.verGrande('${d.imagenUrl}')" loading="lazy">
                 <div class="photo-info">
-                    <div class="photo-title">${d.titulo}</div>
-                    <div class="photo-desc">${d.descripcion}</div>
-                    <div class="photo-date">📅 ${d.fechaRecuerdo}</div>
+                    <div class="photo-title">${d.titulo || ''}</div>
+                    <div class="photo-desc">${d.descripcion || ''}</div>
+                    <div class="photo-date">${d.fechaRecuerdo ? '📅 ' + d.fechaRecuerdo : ''}</div>
                 </div>
             `;
             container.appendChild(div);
