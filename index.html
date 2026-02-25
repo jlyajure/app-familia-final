@@ -2,224 +2,112 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>FAMILIA YAJURE 2026</title>
-    
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#000000">
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
-
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAMILIA YAJURE - DIAGNÓSTICO</title>
     <style>
-        :root { --gold: #FFD700; --bg: #121212; --card: #1E1E1E; --red: #ff4444; }
-        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: #e0e0e0; margin: 0; font-family: 'Outfit', sans-serif; overflow-x: hidden; }
-        
-        /* HEADER DE LUJO */
-        header { background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; width: 100%; z-index: 1000; border-bottom: 1px solid #333; height: 70px; }
-        .logo-area { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-        .logo-img { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--gold); object-fit: cover; }
-        .brand-title { font-size: 18px; font-weight: 900; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; }
-
-        #gallery-view { padding-top: 90px; padding-bottom: 50px; padding-left: 10px; padding-right: 10px; }
-        
-        /* MASONRY GRID (Muro de Fotos) */
-        .masonry { column-count: 2; column-gap: 10px; }
-        .photo-card { break-inside: avoid; margin-bottom: 10px; background: var(--card); border-radius: 15px; overflow: hidden; position: relative; border: 1px solid #333; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        .photo-img { width: 100%; display: block; border-bottom: 1px solid #333; }
-        .photo-info { padding: 10px; }
-        .photo-title { font-size: 14px; font-weight: 700; color: white; margin-bottom: 4px; }
-        .photo-desc { font-size: 12px; color: #aaa; line-height: 1.4; }
-        .photo-date { font-size: 10px; color: var(--gold); margin-top: 5px; text-align: right; font-style: italic; }
-
-        /* 🔥 BOTONES DE ADMIN (Solo visibles en modo Director) */
-        .admin-controls { display: none; position: absolute; top: 5px; right: 5px; gap: 5px; z-index: 10; }
-        .btn-mini { width: 30px; height: 30px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; color: black; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
-        .btn-del { background: var(--red); color: white; }
-        .btn-edit { background: var(--gold); }
-        
-        body.admin-mode .admin-controls { display: flex; }
-
-        /* ADMIN PANEL */
-        #admin-panel { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:2000; overflow-y:auto; padding:20px; }
-        .admin-box { background:#222; border:1px solid var(--gold); max-width:500px; margin:50px auto; padding:20px; border-radius:20px; }
-        .admin-input { width:100%; background:#111; border:1px solid #444; color:white; padding:12px; margin-bottom:15px; border-radius:10px; }
-        .admin-btn { width:100%; background:var(--gold); color:black; font-weight:bold; padding:12px; border:none; border-radius:10px; cursor:pointer; font-size: 16px; }
-
-        /* MODAL DE FOTO COMPLETA */
-        #full-view { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 3000; align-items: center; justify-content: center; flex-direction: column; }
-        #full-img { max-width: 95%; max-height: 80vh; border-radius: 10px; box-shadow: 0 0 20px rgba(255, 215, 0, 0.2); }
-        .btn-close { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.2); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 20px; cursor: pointer; }
-
-        @media (min-width: 768px) {
-            .masonry { column-count: 4; column-gap: 20px; }
-            #gallery-view { padding: 100px 40px 50px 40px; }
-        }
+        body { background: #121212; color: white; font-family: sans-serif; padding: 20px; }
+        .card { border: 1px solid gold; margin: 10px; padding: 10px; border-radius: 10px; }
+        img { max-width: 100px; border-radius: 5px; }
+        #error-log { color: #ff4444; font-weight: bold; background: #222; padding: 10px; display: none; }
+        button { padding: 15px; font-size: 16px; background: gold; border: none; border-radius: 10px; width: 100%; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<header>
-    <div class="logo-area" onclick="window.triggerAdmin()">
-        <img src="logo.jpg" class="logo-img" onerror="this.style.display='none'">
-        <div class="brand-title">FAMILIA YAJURE</div>
-    </div>
-</header>
+    <h2 style="text-align:center; color:gold;">MODO DIAGNÓSTICO 🔧</h2>
+    
+    <div id="status">⏳ Intentando conectar con la base de datos...</div>
+    <div id="error-log"></div>
 
-<div id="admin-panel">
-    <div class="admin-box">
-        <h2 style="color:var(--gold); text-align:center;">📸 AGREGAR FOTO</h2>
-        <input type="text" id="up-titulo" class="admin-input" placeholder="Título (Ej: Cumpleaños Tía Rosa)">
-        <textarea id="up-desc" class="admin-input" rows="3" placeholder="Descripción o anécdota..."></textarea>
-        <input type="date" id="up-fecha" class="admin-input">
-        
-        <label style="color:#ccc; display:block; margin-bottom:5px;">Seleccionar Foto:</label>
-        <input type="file" id="up-file" class="admin-input" accept="image/*">
-        
-        <button onclick="window.subirFoto()" id="btn-subir" class="admin-btn">🚀 SUBIR RECUERDO</button>
-        <div id="upload-status" style="color:white; text-align:center; margin-top:15px;"></div>
-        <button onclick="document.getElementById('admin-panel').style.display='none'" style="background:#333; color:white; width:100%; padding:10px; border:none; border-radius:10px; margin-top:10px; cursor:pointer;">CERRAR</button>
-    </div>
-</div>
+    <div id="gallery" style="margin-top:20px;"></div>
 
-<div id="gallery-view">
-    <div id="photos-container" class="masonry">
-        <p style="color:#666; text-align:center; width:100%;">Cargando álbum...</p>
-    </div>
-</div>
+    <button onclick="window.triggerAdmin()" style="margin-top:20px;">👮‍♂️ MODO DIRECTOR</button>
 
-<div id="full-view" onclick="this.style.display='none'">
-    <button class="btn-close">×</button>
-    <img id="full-img" src="">
-</div>
+    <div id="admin-panel" style="display:none; background:#333; padding:20px; position:fixed; top:0; left:0; width:100%; height:100%;">
+        <h3>Subir Foto</h3>
+        <input type="text" id="up-titulo" placeholder="Título" style="width:100%; padding:10px; margin-bottom:10px;">
+        <input type="file" id="up-file" style="margin-bottom:10px;">
+        <button onclick="window.subirFoto()">SUBIR</button>
+        <button onclick="location.reload()" style="background:red; margin-top:10px; color:white;">CERRAR</button>
+    </div>
 
 <script type="module">
+    // 🔥 IMPORTACIONES BÁSICAS
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, updateDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+    // 1. CONFIGURACIÓN (TUS LLAVES)
     const firebaseConfig = { apiKey: "AIzaSyBwBq4gLgv4DSfUidzUuC7Irmvj_4pCTtI", authDomain: "familia-yajure-app.firebaseapp.com", projectId: "familia-yajure-app", storageBucket: "familia-yajure-app.firebasestorage.app", messagingSenderId: "692035727386", appId: "1:692035727386:web:dfa3e39a481d56368a61a3" };
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const IMGBB_KEY = "07dd4f0a1180673510c5047ae8b5eec8";
 
-    // 🔥 MODO DIRECTOR
-    let adminClicks = 0; let adminTimer;
-    window.triggerAdmin = () => {
-        adminClicks++; clearTimeout(adminTimer); adminTimer = setTimeout(() => { adminClicks = 0; }, 1000);
-        if (adminClicks === 3) {
-            const pass = prompt("🔐 CLAVE DE FAMILIA:");
-            if (pass === "ticoadmin2026") { 
-                document.body.classList.add('admin-mode'); 
-                document.getElementById('admin-panel').style.display = 'block'; 
-            } else { alert("❌ Clave incorrecta"); }
-            adminClicks = 0;
-        }
-    };
+    try {
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const IMGBB_KEY = "07dd4f0a1180673510c5047ae8b5eec8";
 
-    // 🚀 SUBIR FOTO
-    window.subirFoto = async () => {
-        const tit = document.getElementById('up-titulo').value;
-        const desc = document.getElementById('up-desc').value;
-        const fecha = document.getElementById('up-fecha').value;
-        const file = document.getElementById('up-file').files[0];
-        const status = document.getElementById('upload-status');
+        document.getElementById('status').innerText = "✅ Firebase Conectado. Buscando fotos en 'familia'...";
 
-        if(!file) { alert("¡Falta la foto!"); return; }
-        
-        status.innerHTML = "⏳ Comprimiendo y subiendo...";
-        try {
-            const compressedImg = await compressImage(file);
-            const formData = new FormData(); formData.append("image", compressedImg);
-            const resImg = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: formData });
-            const dataImg = await resImg.json(); const urlImg = dataImg.data.url;
-
-            status.innerHTML = "📝 Guardando en el álbum...";
+        // 2. LEER BASE DE DATOS (SIN ORDENAR PARA EVITAR ERRORES)
+        // 🔥 IMPORTANTE: Aquí uso la colección "familia"
+        onSnapshot(collection(db, "familia"), (snap) => {
+            const galeria = document.getElementById('gallery');
+            galeria.innerHTML = "";
             
-            // 🔥 AQUÍ CONECTAMOS CON LA GAVETA VIEJA: "familia"
-            await addDoc(collection(db, "familia"), {
-                titulo: tit || "Sin título",
-                descripcion: desc || "",
-                fechaRecuerdo: fecha || "",
-                imagenUrl: urlImg,
-                timestamp: new Date()
-            });
-
-            status.innerHTML = "✅ ¡FOTO GUARDADA!";
-            
-            // Limpieza automática
-            document.getElementById('up-titulo').value = "";
-            document.getElementById('up-desc').value = "";
-            document.getElementById('up-file').value = "";
-            document.getElementById('up-fecha').value = "";
-            setTimeout(() => { status.innerHTML = ""; }, 2000);
-
-        } catch (e) { status.innerHTML = "❌ Error: " + e.message; }
-    };
-
-    // ✏️ EDITAR FOTO
-    window.editarFoto = async (id, oldTit, oldDesc) => {
-        const newTit = prompt("Editar Título:", oldTit);
-        const newDesc = prompt("Editar Descripción:", oldDesc);
-        
-        if (newTit !== null && newDesc !== null) {
-            try {
-                // 🔥 CONECTADO A LA GAVETA "familia"
-                await updateDoc(doc(db, "familia", id), {
-                    titulo: newTit,
-                    descripcion: newDesc
+            if (snap.empty) {
+                document.getElementById('status').innerText = "⚠️ Conectado, pero la carpeta 'familia' está VACÍA o no existe.";
+            } else {
+                document.getElementById('status').innerText = "🎉 ¡FOTOS ENCONTRADAS! (" + snap.size + ")";
+                
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    const item = document.createElement('div');
+                    item.className = "card";
+                    item.innerHTML = `
+                        <div style="display:flex; justify-content:space-between;">
+                            <strong>${data.titulo || "Sin título"}</strong>
+                            <button onclick="window.borrar('${doc.id}')" style="width:30px; height:30px; padding:0; background:red; color:white;">🗑️</button>
+                        </div>
+                        <br>
+                        <img src="${data.imagenUrl}" width="100%">
+                    `;
+                    galeria.appendChild(item);
                 });
-                alert("✅ ¡Editado correctamente!");
-            } catch (e) { alert("Error al editar: " + e.message); }
-        }
-    };
-
-    // 🗑️ BORRAR FOTO
-    window.borrarFoto = async (id) => {
-        if(confirm("¿Seguro que quieres borrar este recuerdo? No se puede recuperar.")) {
-            // 🔥 CONECTADO A LA GAVETA "familia"
-            try { await deleteDoc(doc(db, "familia", id)); } catch(e) { alert("Error: " + e.message); }
-        }
-    };
-
-    async function compressImage(file) { return new Promise((resolve) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = (event) => { const img = new Image(); img.src = event.target.result; img.onload = () => { const canvas = document.createElement('canvas'); let w = img.width; let h = img.height; if (w > 1000) { h *= 1000 / w; w = 1000; } canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h); canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.85); }; }; }); }
-
-    window.verGrande = (url) => {
-        document.getElementById('full-img').src = url;
-        document.getElementById('full-view').style.display = 'flex';
-    };
-
-    // 🔥 LEER ÁLBUM (MODIFICADO PARA MOSTRAR TODO)
-    // Se quitó el ordenamiento por fecha para que las fotos viejas (sin fecha) aparezcan
-    onSnapshot(collection(db, "familia"), (snap) => {
-        const container = document.getElementById('photos-container');
-        if(snap.empty) { container.innerHTML = "<p style='color:white;text-align:center;'>No hay fotos aún.</p>"; return; }
-        
-        container.innerHTML = "";
-        
-        // Convertimos a array para poder invertirlo si queremos (opcional)
-        let fotos = [];
-        snap.forEach(doc => fotos.push({id: doc.id, ...doc.data()}));
-        
-        // Las mostramos tal cual llegan
-        fotos.forEach(d => {
-            const div = document.createElement('div');
-            div.className = "photo-card";
-            div.innerHTML = `
-                <div class="admin-controls">
-                    <button class="btn-mini btn-edit" onclick="window.editarFoto('${d.id}', '${d.titulo || ''}', '${d.descripcion || ''}')">✏️</button>
-                    <button class="btn-mini btn-del" onclick="window.borrarFoto('${d.id}')">🗑️</button>
-                </div>
-                <img src="${d.imagenUrl}" class="photo-img" onclick="window.verGrande('${d.imagenUrl}')" loading="lazy">
-                <div class="photo-info">
-                    <div class="photo-title">${d.titulo || ''}</div>
-                    <div class="photo-desc">${d.descripcion || ''}</div>
-                    <div class="photo-date">${d.fechaRecuerdo ? '📅 ' + d.fechaRecuerdo : ''}</div>
-                </div>
-            `;
-            container.appendChild(div);
+            }
+        }, (error) => {
+            // SI FALLA, MUESTRA ESTO EN ROJO
+            document.getElementById('error-log').style.display = 'block';
+            document.getElementById('error-log').innerText = "❌ ERROR DE LECTURA: " + error.message;
         });
-    });
+
+        // FUNCIONES SIMPLES
+        window.triggerAdmin = () => {
+            if(prompt("Clave:") === "ticoadmin2026") document.getElementById('admin-panel').style.display = "block";
+        };
+
+        window.subirFoto = async () => {
+            const file = document.getElementById('up-file').files[0];
+            const titulo = document.getElementById('up-titulo').value;
+            if(!file) return alert("Falta foto");
+
+            const formData = new FormData(); formData.append("image", file);
+            const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: formData });
+            const json = await res.json();
+            
+            await addDoc(collection(db, "familia"), {
+                titulo: titulo,
+                imagenUrl: json.data.url
+            });
+            alert("Subida!");
+            location.reload();
+        };
+
+        window.borrar = async (id) => {
+            if(confirm("Borrar?")) await deleteDoc(doc(db, "familia", id));
+        };
+
+    } catch (e) {
+        document.getElementById('error-log').style.display = 'block';
+        document.getElementById('error-log').innerText = "💀 ERROR CRÍTICO: " + e.message;
+    }
 </script>
 </body>
 </html>
