@@ -149,6 +149,10 @@
         #close-modal-btn { position: fixed; top: 20px; right: 20px; z-index: 5001; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(8px); width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 50%; box-shadow: 0 4px 15px rgba(0,0,0,0.5); cursor: pointer; transition: 0.2s; }
         #close-modal-btn svg { width: 22px; height: 22px; stroke: white; }
 
+        /* 🔥 NUEVO: BOTÓN DE DESCARGA DIRECTA EN LA LUPA */
+        #download-modal-btn { position: fixed; bottom: 30px; background: var(--wa-green); color: white; border: 2px solid white; padding: 12px 25px; border-radius: 30px; font-size: 15px; font-weight: 800; box-shadow: 0 10px 20px rgba(0,0,0,0.6); cursor: pointer; z-index: 5002; transition: 0.2s; display: flex; align-items: center; gap: 8px; text-transform: uppercase; }
+        #download-modal-btn:active { transform: scale(0.95); }
+
         /* Botón Flotante de WhatsApp */
         .btn-wa-familia { position: fixed; bottom: 85px; right: 20px; background: #25D366; color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 0 20px rgba(37,211,102,0.4); z-index: 5500; transition: 0.3s; }
         .btn-wa-familia:hover { transform: scale(1.1); box-shadow: 0 0 30px rgba(37,211,102,0.8); }
@@ -256,6 +260,8 @@
         </svg>
     </div>
     <img id="modal-img" src="">
+    
+    <button id="download-modal-btn">⬇️ GUARDAR FOTO</button>
 </div>
 
 <a href="https://wa.me/584125852879" target="_blank" class="btn-wa-familia" title="Escríbenos al WhatsApp">
@@ -293,8 +299,44 @@
 
     document.getElementById('btnEntrar').onclick = () => { const val = document.getElementById('passInput').value.trim().toLowerCase(); if(val === CLAVE_NORMAL || val === CLAVE_ADMIN) { localStorage.setItem('familia_auth', val); document.getElementById('login-screen').style.display = 'none'; document.getElementById('app-content').style.display = 'block'; getNombre(); } else { alert("Clave incorrecta 🛑 (Revisa espacios en blanco)"); } };
 
-    window.abrirLupa = (url) => { document.getElementById('modal-img').src = url; document.getElementById('photo-modal').style.display = 'flex'; };
+    // 🔥 LUPA MODIFICADA PARA CONECTAR EL BOTÓN DE DESCARGA
+    window.abrirLupa = (url) => { 
+        document.getElementById('modal-img').src = url; 
+        document.getElementById('photo-modal').style.display = 'flex'; 
+        // Le pasamos la url de la foto al botón de descarga
+        document.getElementById('download-modal-btn').onclick = () => window.descargarFoto(url);
+    };
+    
     window.cerrarLupa = () => { document.getElementById('photo-modal').style.display = 'none'; };
+
+    // 🔥 LA FUNCIÓN MÁGICA PARA GUARDAR FOTOS
+    window.descargarFoto = async (url) => {
+        const btn = document.getElementById('download-modal-btn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = "⏳ Guardando...";
+        
+        try {
+            // Intenta descargarla de forma invisible
+            const response = await fetch(url);
+            const blob = await response.blob();
+            const blobUrl = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = 'Recuerdo_Familia_' + new Date().getTime() + '.jpg';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(blobUrl);
+            btn.innerHTML = "✅ ¡Listo en Galería!";
+        } catch (error) {
+            // Si el celular bloquea la descarga, la abre en una pestaña nueva para que la guarden
+            window.open(url, '_blank');
+            btn.innerHTML = "✅ Foto Abierta";
+        }
+        
+        // Vuelve a su estado normal después de 3 segundos
+        setTimeout(() => { btn.innerHTML = originalText; }, 3000);
+    };
 
     // ☀️ MODO DÍA/NOCHE
     window.toggleTheme = () => {
